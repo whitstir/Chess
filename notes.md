@@ -34,3 +34,7 @@ String concatenation is inefficient because it creates a new String for every co
 - String substring(int, int)
 
 You can also put in special characters!!! 
+
+### Phase 0
+
+Have ChessPiece class by itself, include color and type. Have completely seperate classes for King, Queen, etc. Then call pieceMoves method on each different class?
