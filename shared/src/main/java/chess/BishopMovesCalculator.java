@@ -3,8 +3,11 @@ package chess;
 import java.util.Collection;
 
 public class BishopMovesCalculator {
+
+    private final int[][] directions = {{1,1},{1,-1},{-1,1},{-1,-1}};
+
     public Collection<ChessMove> getMoves(ChessBoard board, ChessPosition position) {
         PieceMovesCalculator calculator = new PieceMovesCalculator();
-        return calculator.calcDiagonalMoves(board, position);
+        return calculator.findMoves(board, position, directions);
     }
 }
