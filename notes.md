@@ -79,3 +79,47 @@ Copies the object and all objects it references, recursively
 - Key value pairs
 - A collection that maps keys to values where the keys are unique
 #### Equality Checking
+
+### Java I/O Streams (overview)
+- Writes/reads data from files or other data sources
+- Two Choices: Binary-Formatted or Text-Formatted Data
+- InputStream and Output Stream
+- Reader and Writer
+
+#### Reading/Writing Bytes
+The InputStream interface is used to read bytes sequentially from a data source.
+There are mnay features you may want to enable when consuming data from an InputStream.
+- Decompress data as it comes out of the stream
+- Decrypt data as it comes out of the stream
+- Compute a "digest" of the stream (a fixed length value that summarizes that data in the stream)
+- Byte counting
+- Line counting
+- Buffering
+
+The OutputStream interface is used to write bytes sequentially to a data destination
+- Compress data as it goes into the stream
+- Encrypt data as it goes into the stream
+- Compute a "digest" of the stream (a fixed length value that summarizes that data in the stream)
+- Byte counting
+
+#### Reading/Writing Binary-Formatted Data
+- Reading/writing bytes is useful, but usually we want to read/write larger data values like float, int, boolean, etc
+- The DataOutputStream class lets you write binary-formatted data values
+- he DataOutputStream constructor wraps a DataOutputStream around any OutputStream
+
+#### Readers and Writers 
+- Reader Interface: used to read characters sequetially from a data source
+- Writer Interface: used to write characters sequentially from a data source
+
+#### Reading/Writing Text-Formatted Data
+- The PrintWriter class lets you write text-formatted data values (String, int, float, boolean, etc)
+- The Scanner class lets you read text-formatted data values
+
+
+
+
+
+
+
+
+
