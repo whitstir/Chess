@@ -17,7 +17,6 @@ public class ChessGame {
 
     public ChessGame() {
         board = new ChessBoard();
-        board.resetBoard();
         setTeamTurn(TeamColor.WHITE);
     }
 
@@ -58,8 +57,7 @@ public class ChessGame {
         if (piece == null) {
             return null;
         } else {
-            ChessPiece getMoves = new ChessPiece(piece.getTeamColor(), piece.getPieceType());
-            Collection<ChessMove> possibleMoves = getMoves.pieceMoves(board, startPosition);
+            Collection<ChessMove> possibleMoves = board.getPiece(startPosition).pieceMoves(board, startPosition);
             return validPieceMoves;
         }
 
@@ -82,9 +80,40 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
-        // so i'm thinking i might fix the moves in piecemoves calc to set a boolean value if the piece can kill the king
-        // and then if that is true, then it passes that here and the king will know if it can be killed?
+        ChessPosition kingPosition = getKingPosition();
+        ChessPiece kingPiece = board.getPiece(kingPosition);
+        Collection<ChessMove> possibleMoves = new ArrayList<>();
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPosition currentPosition = new ChessPosition(i, j);
+                ChessPiece currentPiece = board.getPiece(currentPosition);
+                if (currentPiece.getTeamColor() == kingPiece.getTeamColor() || currentPiece.getPieceType() == null) {
+                    continue;
+                } else {
+                    possibleMoves = currentPiece.pieceMoves(board, currentPosition);
+                    for (ChessMove enemyMove : possibleMoves) {
+                        ChessPosition enemyEndPosition = enemyMove.getEndPosition();
+                        return enemyEndPosition.equals(kingPosition);
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private ChessPosition getKingPosition() {
+        ChessPosition kingPosition = null;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPosition currentPosition = new ChessPosition(i, j);
+                ChessPiece currentPiece = board.getPiece(currentPosition);
+                if (currentPiece.getPieceType() == ChessPiece.PieceType.KING) {
+                    kingPosition = currentPosition;
+                }
+            }
+        }
+        return kingPosition;
     }
 
     /**
