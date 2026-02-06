@@ -59,12 +59,12 @@ public class PieceMovesCalculator {
         int row = position.getRow();
         int col = position.getColumn();
         ChessPiece piece = board.getPiece(position);
-
         int[][] captureDirections;
+
         if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-            captureDirections = new int[][] {{1,1},{1,-1}};
+            captureDirections = new int[][]{{1, 1}, {1, -1}};
         } else {
-            captureDirections = new int[][] {{-1,1},{-1,-1}};
+            captureDirections = new int[][]{{-1, 1}, {-1, -1}};
         }
 
         for (int[] direction : captureDirections) {
@@ -131,6 +131,7 @@ public class PieceMovesCalculator {
     private Collection<ChessMove> findPawnPromotions(ChessBoard board, ChessPosition position, ChessPosition newPosition,
                                                      int row, ChessPiece piece) {
         Collection<ChessMove> possibleMoves = new ArrayList<>();
+
         if (pawnAtEnd(row, piece)) {
             possibleMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.QUEEN));
             possibleMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.ROOK));

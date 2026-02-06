@@ -54,11 +54,14 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
+
         if (piece == null) {
             return null;
         }
+
         Collection<ChessMove> validPieceMoves = new ArrayList<>();
         Collection<ChessMove> possibleMoves = piece.pieceMoves(board, startPosition);
+
         for (ChessMove move : possibleMoves) {
             ChessBoard boardCopy = new ChessBoard(board);
             ChessPiece copyPiece = boardCopy.getPiece(startPosition);
@@ -82,24 +85,34 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = board.getPiece(move.getStartPosition());
+
         if (piece == null) {
             throw new InvalidMoveException("There is no piece here!");
         }
-        Collection<ChessMove> validPieceMoves = validMoves(move.getStartPosition());
-        if (isTeamTurn(piece) && moveIsValid(move)) {
-            ChessPiece movingPiece = board.getPiece(move.getStartPosition());
-            if (move.getPromotionPiece() != null) {
-                movingPiece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
-            }
-            board.addPiece(move.getStartPosition(), null);
-            board.addPiece(move.getEndPosition(), movingPiece);
-            if (getTeamTurn() == TeamColor.WHITE) {
-                setTeamTurn(TeamColor.BLACK);
-            } else {
-                setTeamTurn(TeamColor.WHITE);
-            }
-        } else {
+        if (!isTeamTurn(piece)) {
             throw new InvalidMoveException("It is not your turn!");
+        }
+        if (!moveIsValid(move)) {
+            throw new InvalidMoveException("Invalid move!");
+        }
+
+        Collection<ChessMove> validPieceMoves = validMoves(move.getStartPosition());
+        ChessPiece movingPiece = board.getPiece(move.getStartPosition());
+
+        if (move.getPromotionPiece() != null) {
+            movingPiece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
+        }
+
+        board.addPiece(move.getStartPosition(), null);
+        board.addPiece(move.getEndPosition(), movingPiece);
+        changeTurn();
+    }
+
+    private void changeTurn() {
+        if (getTeamTurn() == TeamColor.WHITE) {
+            setTeamTurn(TeamColor.BLACK);
+        } else {
+            setTeamTurn(TeamColor.WHITE);
         }
     }
 
