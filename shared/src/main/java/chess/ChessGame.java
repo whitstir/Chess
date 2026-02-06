@@ -79,7 +79,35 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        if (piece == null) {
+            throw new InvalidMoveException("There is no piece here!");
+        }
+        Collection<ChessMove> validPieceMoves = validMoves(move.getStartPosition());
+        if (isTeamTurn(piece) && moveIsValid(move)) {
+            ChessPiece movingPiece = board.getPiece(move.getStartPosition());
+            if (move.getPromotionPiece() != null) {
+                movingPiece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
+            }
+            board.addPiece(move.getStartPosition(), null);
+            board.addPiece(move.getEndPosition(), movingPiece);
+            if (getTeamTurn() == TeamColor.WHITE) {
+                setTeamTurn(TeamColor.BLACK);
+            } else {
+                setTeamTurn(TeamColor.WHITE);
+            }
+        } else {
+            throw new InvalidMoveException("It is not your turn!");
+        }
+    }
+
+    public boolean moveIsValid(ChessMove move) {
+        Collection<ChessMove> validPieceMoves = validMoves(move.getStartPosition());
+        return validPieceMoves.contains(move);
+    }
+
+    public boolean isTeamTurn(ChessPiece piece) {
+        return piece.getTeamColor() == getTeamTurn();
     }
 
     /**
@@ -176,3 +204,4 @@ public class ChessGame {
         return Objects.hash(teamTurn, board);
     }
 }
+
