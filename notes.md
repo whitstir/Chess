@@ -187,7 +187,18 @@ Seperation of Interface and Implementation
 - Disadvantages of duplication: N copies to maintain, bugs are duplicated N times, makes programs longer, decreases maintainability
 - Solutions: factor common code into a seperate method or class, shared code might be placed in a common superclass
 
+## Chess Server Design (Phase 2)
+We're going to have a server application with a WebAPI, read Phase 3 specs for more details. 
+- Single Resposibility Principle
+- Avoid Code Duplication
+- Encapsultion/Information Hiding (make class members private when possible)
 
+Look at Phase 3 Specs for helpful tips and stuff. 
+
+Data Access Object --> Model
+
+### Data Access Object
+- Think of CRUD
 
 
 
