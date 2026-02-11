@@ -200,5 +200,35 @@ Data Access Object --> Model
 ### Data Access Object
 - Think of CRUD
 
+## HTTP Overview
+Distributed System: The system that is running on multiple machines
+
+Client connects to Server
+- Client establishes a network connection with the server
+- A connection allows the client to send bytes to the server and vice versa
+- IP addresses are hard to work with and remember so we specify the IP address with a domain name
+- The client uses the domain name service (DNS) to convert the server's domain name to an IP address
+- The server will probably be running multiple programs (which are probably using the internet), meaning that the server's IP address is not sufficient for the client to connect to the server program
+- Each server program communicates on a particular port number (an unsigned integer in the range 1-65535)
+- The client needs to know both the server program's IP address and port number in order to connect to it
+
+URL: Uniform Resource Locator
+
+Most of the chess project is going to be done with POST requests
+
+#### HTTPS Methods
+GET, POST, PUT, DELETE, etc
+
+#### cURL
+Client-URL
+- Easy experimentation with HTTP endpoints
+- Available everywhere
+- Great for sharing with others, debugging endpoints, etc
+
+Example request --> curl byu.edu
+
+Look at slides for parameters to use with curl
+
+
 
 
