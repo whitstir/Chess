@@ -229,6 +229,29 @@ Example request --> curl byu.edu
 
 Look at slides for parameters to use with curl
 
+## Javalin Overview
+- An open source framework for building small Java applications and web APIs
+- Create handler methods for handling HTTP requests and returning HTTP responses
+- Serve website files to web browers
+
+### Handlers
+### Endpoint
+Basically just a route with a url bound to it. 
+
+Before and After Handlers
+- Provides a way to execute common code for multiple routes without code duplication
+- Throwing a response exception prevents further processing by other handlers
+- Responses can be thrown from before or after endpoint handlers
+- Before and after routes take an option pattern to restrict the routes to which they are applied
+- beforeMatched(...) only applies to routes that have a matching endpoint handler
+- You can  have multiple before/after filters
+
+### Useful Request and Response Methods
+See slides 
+
+## Error Handling
+- Handling exceptions --> call .exception
+- Handling status codes --> call .error
 
 
 
