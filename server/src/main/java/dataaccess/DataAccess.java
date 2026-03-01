@@ -6,15 +6,11 @@ import javax.xml.crypto.Data;
 import java.util.Collection;
 
 public interface DataAccess {
-    void insertUser(UserData user) throws DataAccessException;
+    void clear() throws DataAccessException;
+
+    void createUser(UserData user) throws DataAccessException;
 
     UserData getUser(String username) throws DataAccessException;
-
-    void createAuth(AuthData auth) throws DataAccessException;
-
-    AuthData getAuth(String authToken) throws DataAccessException;
-
-    void deleteAuth(String authToken) throws DataAccessException;
 
     int createGame(GameData game) throws DataAccessException;
 
@@ -24,5 +20,9 @@ public interface DataAccess {
 
     void updateGame(GameData game) throws DataAccessException;
 
-    void clear() throws DataAccessException;
+    void createAuth(AuthData auth) throws DataAccessException;
+
+    AuthData getAuth(String authToken) throws DataAccessException;
+
+    void deleteAuth(String authToken) throws DataAccessException;
 }
