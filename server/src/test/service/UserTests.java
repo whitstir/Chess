@@ -48,6 +48,7 @@ public class UserTests {
     public void createDuplicateUser() throws DataAccessException {
         RegisterRequest testUser = new RegisterRequest("whitney", "12345", "whitstir@byu.edu");
         testService.registerUser(testUser);
+
         assertThrows(DataAccessException.class, () -> {
             testService.registerUser(testUser);
         });
@@ -94,16 +95,35 @@ public class UserTests {
     public void loginWrongPassword() throws DataAccessException {
         testDAO.createUser(new UserData("whitney", "12345", "whitstir@byu.edu"));
         LoginRequest testRequest = new LoginRequest("whitney", "00000");
+
         assertThrows(DataAccessException.class, () -> testService.login(testRequest));
     }
 
     @Test
     public void loginUserNotFound() throws DataAccessException {
         LoginRequest testRequest = new LoginRequest("whitney", "12345");
+
         assertThrows(DataAccessException.class, () -> testService.login(testRequest));
     }
 
     //My positive logout test
 
+    @Test
+    public void logoutSuccessfully() throws DataAccessException {
+        testDAO.createUser(new UserData("whitney", "12345", "whitstir@byu.edu"));
+        String token = UserService.generateToken();
+        testDAO.createAuth(new AuthData(token, "whitney"));
+        LogoutRequest testRequest = new LogoutRequest(token);
+        testService.logout(testRequest);
 
+        assertNull(testDAO.getAuth(token));
+    }
+
+    //My negative logout test
+
+    @Test
+    public void logoutMissingToken() throws DataAccessException {
+        LogoutRequest testRequest = new LogoutRequest(null);
+        assertThrows(DataAccessException.class, () -> testService.logout(testRequest));
+    }
 }

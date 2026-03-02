@@ -56,4 +56,15 @@ public class UserService {
 
         return new LoginResult(newUser.username(), token);
     }
+
+    public void logout(LogoutRequest logoutRequest) throws DataAccessException {
+        if (logoutRequest.authToken() == null || logoutRequest.authToken().isEmpty()) {
+            throw new DataAccessException("Missing auth token");
+        }
+        AuthData auth = dao.getAuth(logoutRequest.authToken());
+        if (auth == null) {
+            throw new DataAccessException("Invalid auth token");
+        }
+        dao.deleteAuth(logoutRequest.authToken());
+    }
 }
