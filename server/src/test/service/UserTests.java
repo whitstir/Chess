@@ -12,19 +12,19 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UserTests {
 
     private MemoryDataAccess testDAO;
-    private RegisterRequest testUser;
     private UserService testService;
 
     @BeforeEach
     public void setup() {
         testDAO = new MemoryDataAccess();
-        testUser = new RegisterRequest("whitney", "12345", "whitstir@byu.edu");
         testService = new UserService(testDAO);
     }
 
+    //My positive create/register user test
 
     @Test
-    public void createUserPass() throws DataAccessException {
+    public void createUserSuccessfully() throws DataAccessException {
+        RegisterRequest testUser = new RegisterRequest("whitney", "12345", "whitstir@byu.edu");
         RegisterResult testResult = testService.registerUser(testUser);
         UserData storedUser = testDAO.getUser("whitney");
         AuthData storedAuth = testDAO.getAuth(testResult.authToken());
@@ -42,8 +42,11 @@ public class UserTests {
         assertEquals(testUser.username(), storedUser.username());
     }
 
+    //My negative create/register user tests
+
     @Test
     public void createDuplicateUser() throws DataAccessException {
+        RegisterRequest testUser = new RegisterRequest("whitney", "12345", "whitstir@byu.edu");
         testService.registerUser(testUser);
         assertThrows(DataAccessException.class, () -> {
             testService.registerUser(testUser);
@@ -62,5 +65,45 @@ public class UserTests {
         assertThrows(DataAccessException.class, () -> testService.registerUser(missingEmail));
         assertThrows(DataAccessException.class, () -> testService.registerUser(missingEverything));
     }
+
+    //My positive login test
+
+    @Test
+    public void loginSuccessfully() throws DataAccessException {
+        testDAO.createUser(new UserData("whitney", "12345", "whitstir@byu.edu"));
+        LoginRequest testUser = new LoginRequest("whitney", "12345");
+        LoginResult testResult = testService.login(testUser);
+
+        assertEquals("whitney", testResult.username());
+        assertNotNull(testResult.authToken());
+        assertNotNull(testDAO.getAuth(testResult.authToken()));
+    }
+
+    //My negative login tests
+
+    @Test
+    public void loginMissingFields() throws DataAccessException {
+        LoginRequest missingUsername = new LoginRequest(null, "12345");
+        LoginRequest missingPassword = new LoginRequest("whitney", null);
+
+        assertThrows(DataAccessException.class, () -> testService.login(missingUsername));
+        assertThrows(DataAccessException.class, () -> testService.login(missingPassword));
+    }
+
+    @Test
+    public void loginWrongPassword() throws DataAccessException {
+        testDAO.createUser(new UserData("whitney", "12345", "whitstir@byu.edu"));
+        LoginRequest testRequest = new LoginRequest("whitney", "00000");
+        assertThrows(DataAccessException.class, () -> testService.login(testRequest));
+    }
+
+    @Test
+    public void loginUserNotFound() throws DataAccessException {
+        LoginRequest testRequest = new LoginRequest("whitney", "12345");
+        assertThrows(DataAccessException.class, () -> testService.login(testRequest));
+    }
+
+    //My positive logout test
+
 
 }

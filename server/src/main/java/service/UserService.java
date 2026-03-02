@@ -5,6 +5,7 @@ import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class UserService {
@@ -32,12 +33,27 @@ public class UserService {
         dao.createUser(newUser);
 
         String token = generateToken();
-        dao.createAuth(new AuthData(token, registerRequest.username()));
+        dao.createAuth(new AuthData(token, newUser.username()));
 
-        return new RegisterResult(registerRequest.username(), token);
+        return new RegisterResult(newUser.username(), token);
     }
 
-    public LoginResult login(LoginResult loginResult) {
+    public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
+        if (loginRequest.username() == null || loginRequest.username().isEmpty() ||
+            loginRequest.password() == null || loginRequest.password().isEmpty()) {
+            throw new DataAccessException("Invalid input");
+        }
+        UserData newUser = dao.getUser(loginRequest.username());
+        if (newUser == null) {
+            throw new DataAccessException("User does not exist");
+        }
+        if (!Objects.equals(newUser.password(), loginRequest.password())) {
+            throw new DataAccessException("Incorrect password");
+        }
 
+        String token = generateToken();
+        dao.createAuth(new AuthData(token, newUser.username()));
+
+        return new LoginResult(newUser.username(), token);
     }
 }
