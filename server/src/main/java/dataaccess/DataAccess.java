@@ -2,7 +2,6 @@ package dataaccess;
 
 import model.*;
 
-import javax.xml.crypto.Data;
 import java.util.Collection;
 
 public interface DataAccess {
@@ -12,7 +11,7 @@ public interface DataAccess {
 
     UserData getUser(String username) throws DataAccessException;
 
-    int createGame(GameData game) throws DataAccessException;
+    void createGame(GameData game) throws DataAccessException;
 
     GameData getGame(int gameID) throws DataAccessException;
 
