@@ -43,12 +43,24 @@ public class UserTests {
     }
 
     @Test
-    public void createUserFail() throws DataAccessException {
-        //tries to create duplicate user
+    public void createDuplicateUser() throws DataAccessException {
         testService.registerUser(testUser);
         assertThrows(DataAccessException.class, () -> {
             testService.registerUser(testUser);
         });
+    }
+
+    @Test
+    public void createUserMissingFields() throws DataAccessException {
+        RegisterRequest missingUsername = new RegisterRequest(null, "12345", "whitstir@byu.edu");
+        RegisterRequest missingPassword = new RegisterRequest("whitney", null, "whitstir@byu.edu");
+        RegisterRequest missingEmail = new RegisterRequest("whitney", "12345", null);
+        RegisterRequest missingEverything = new RegisterRequest(null, null, null);
+
+        assertThrows(DataAccessException.class, () -> testService.registerUser(missingUsername));
+        assertThrows(DataAccessException.class, () -> testService.registerUser(missingPassword));
+        assertThrows(DataAccessException.class, () -> testService.registerUser(missingEmail));
+        assertThrows(DataAccessException.class, () -> testService.registerUser(missingEverything));
     }
 
 }

@@ -19,21 +19,25 @@ public class UserService {
         return UUID.randomUUID().toString();
     }
 
-    public RegisterResult registerUser(RegisterRequest request) throws DataAccessException {
-        if (request.username() == null || request.username().isEmpty() ||
-            request.password() == null || request.password().isEmpty() ||
-            request.email() == null || request.email().isEmpty()) {
+    public RegisterResult registerUser(RegisterRequest registerRequest) throws DataAccessException {
+        if (registerRequest.username() == null || registerRequest.username().isEmpty() ||
+            registerRequest.password() == null || registerRequest.password().isEmpty() ||
+            registerRequest.email() == null || registerRequest.email().isEmpty()) {
             throw new DataAccessException("Invalid input");
         }
-        if (dao.getUser(request.username()) != null) {
+        if (dao.getUser(registerRequest.username()) != null) {
             throw new DataAccessException("User already exists");
         }
-        UserData newUser = new UserData(request.username(), request.password(), request.email());
+        UserData newUser = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
         dao.createUser(newUser);
 
         String token = generateToken();
-        dao.createAuth(new AuthData(token, request.username()));
+        dao.createAuth(new AuthData(token, registerRequest.username()));
 
-        return new RegisterResult(request.username(), token);
+        return new RegisterResult(registerRequest.username(), token);
+    }
+
+    public LoginResult login(LoginResult loginResult) {
+
     }
 }
