@@ -3,8 +3,10 @@ package service;
 import chess.ChessGame;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
+import model.AuthData;
 import model.GameData;
 import service.requests.CreateGameRequest;
+import service.requests.JoinGameRequest;
 import service.results.CreateGameResult;
 
 import java.util.UUID;
@@ -34,5 +36,34 @@ public class GameService {
                 new ChessGame());
         dao.createGame(newGame);
         return new CreateGameResult(newID);
+    }
+
+    public void joinGame(JoinGameRequest joinGameRequest) throws DataAccessException {
+        AuthData auth = dao.getAuth(joinGameRequest.authToken());
+        GameData game = dao.getGame(joinGameRequest.gameID());
+        String username = auth.username();
+
+        if (joinGameRequest.authToken() == null || dao.getAuth(joinGameRequest.authToken()) == null) {
+            throw new DataAccessException("");
+        }
+        if (joinGameRequest.playerColor() == null || joinGameRequest.playerColor().isEmpty() ||
+                !joinGameRequest.playerColor().equals("WHITE") && !joinGameRequest.playerColor().equals("BLACK")) {
+            throw new DataAccessException("");
+        }
+        if (game == null) {
+            throw new DataAccessException("");
+        }
+        if (joinGameRequest.playerColor().equals("WHITE")) {
+            if (game.whiteUsername() != null) {
+                throw new DataAccessException("This color is already taken");
+            }
+            game = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
+        } else {
+            if (game.blackUsername() != null) {
+                throw new DataAccessException("This color is already taken");
+            }
+            game = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
+        }
+        dao.updateGame(game);
     }
 }

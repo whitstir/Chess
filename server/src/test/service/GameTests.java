@@ -1,12 +1,15 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.requests.CreateGameRequest;
+import service.requests.JoinGameRequest;
 import service.results.CreateGameResult;
 
 import javax.xml.crypto.Data;
@@ -27,7 +30,7 @@ public class GameTests {
     //My positive createGame test
 
     @Test
-    public void createGameSuccessfully() throws DataAccessException  {
+    public void createGameSuccessfully() throws DataAccessException {
         testDAO.createUser(new UserData("whitney", "12345", "email@email.com"));
         String token = UserService.generateToken();
         testDAO.createAuth(new AuthData(token, "whitney"));
@@ -47,6 +50,32 @@ public class GameTests {
         assertThrows(DataAccessException.class, () -> testService.createGame(testRequest));
     }
 
+    //My positive joinGame test
 
+    @Test
+    public void joinGameSuccessfully() throws DataAccessException {
+        testDAO.createUser(new UserData("whitney", "12345", "email@email.com"));
+        String token = UserService.generateToken();
+        testDAO.createAuth(new AuthData(token, "whitney"));
+        GameData game = new GameData(1, null, null, "game1", new ChessGame());
+        testDAO.createGame(game);
+        JoinGameRequest testRequest = new JoinGameRequest(token, "WHITE", 1);
+        testService.joinGame(testRequest);
+        GameData updateGame = testDAO.getGame(1);
 
+        assertNotNull(testDAO.getGame(testRequest.gameID()));
+        assertEquals("whitney", updateGame.whiteUsername());
+    }
+
+    //My negative joinGame test
+
+    @Test
+    public void joinGameDoesNotExist() throws DataAccessException {
+        testDAO.createUser(new UserData("whitney", "12345", "email@email.com"));
+        String token = UserService.generateToken();
+        testDAO.createAuth(new AuthData(token, "whitney"));
+        JoinGameRequest testRequest = new JoinGameRequest(token, "WHITE", 5);
+        
+        assertThrows(DataAccessException.class, () -> testService.joinGame(testRequest));
+    }
 }
