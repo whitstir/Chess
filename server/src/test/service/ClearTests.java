@@ -17,7 +17,7 @@ public class ClearTests {
     @BeforeEach
     public void setup() {
         testDAO = new MemoryDataAccess();
-        testUser = new UserData("whitney", "12345", "whitstir@byu.edu");
+        testUser = new UserData("whitney", "12345", "email@email.com");
         testService = new ClearService(testDAO);
     }
 

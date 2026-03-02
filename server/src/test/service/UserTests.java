@@ -29,7 +29,7 @@ public class UserTests {
 
     @Test
     public void createUserSuccessfully() throws DataAccessException {
-        RegisterRequest testUser = new RegisterRequest("whitney", "12345", "whitstir@byu.edu");
+        RegisterRequest testUser = new RegisterRequest("whitney", "12345", "email@email.com");
         RegisterResult testResult = testService.registerUser(testUser);
         UserData storedUser = testDAO.getUser("whitney");
         AuthData storedAuth = testDAO.getAuth(testResult.authToken());
@@ -51,7 +51,7 @@ public class UserTests {
 
     @Test
     public void createDuplicateUser() throws DataAccessException {
-        RegisterRequest testUser = new RegisterRequest("whitney", "12345", "whitstir@byu.edu");
+        RegisterRequest testUser = new RegisterRequest("whitney", "12345", "email@email.com");
         testService.registerUser(testUser);
 
         assertThrows(DataAccessException.class, () -> {
@@ -61,8 +61,8 @@ public class UserTests {
 
     @Test
     public void createUserMissingFields() throws DataAccessException {
-        RegisterRequest missingUsername = new RegisterRequest(null, "12345", "whitstir@byu.edu");
-        RegisterRequest missingPassword = new RegisterRequest("whitney", null, "whitstir@byu.edu");
+        RegisterRequest missingUsername = new RegisterRequest(null, "12345", "email@email.com");
+        RegisterRequest missingPassword = new RegisterRequest("whitney", null, "email@email.com");
         RegisterRequest missingEmail = new RegisterRequest("whitney", "12345", null);
         RegisterRequest missingEverything = new RegisterRequest(null, null, null);
 
@@ -76,7 +76,7 @@ public class UserTests {
 
     @Test
     public void loginSuccessfully() throws DataAccessException {
-        testDAO.createUser(new UserData("whitney", "12345", "whitstir@byu.edu"));
+        testDAO.createUser(new UserData("whitney", "12345", "email@email.com"));
         LoginRequest testUser = new LoginRequest("whitney", "12345");
         LoginResult testResult = testService.login(testUser);
 
@@ -98,7 +98,7 @@ public class UserTests {
 
     @Test
     public void loginWrongPassword() throws DataAccessException {
-        testDAO.createUser(new UserData("whitney", "12345", "whitstir@byu.edu"));
+        testDAO.createUser(new UserData("whitney", "12345", "email@email.com"));
         LoginRequest testRequest = new LoginRequest("whitney", "00000");
 
         assertThrows(DataAccessException.class, () -> testService.login(testRequest));
@@ -115,7 +115,7 @@ public class UserTests {
 
     @Test
     public void logoutSuccessfully() throws DataAccessException {
-        testDAO.createUser(new UserData("whitney", "12345", "whitstir@byu.edu"));
+        testDAO.createUser(new UserData("whitney", "12345", "email@email.com"));
         String token = UserService.generateToken();
         testDAO.createAuth(new AuthData(token, "whitney"));
         LogoutRequest testRequest = new LogoutRequest(token);
