@@ -4,6 +4,11 @@ import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
+import service.requests.LoginRequest;
+import service.requests.LogoutRequest;
+import service.requests.RegisterRequest;
+import service.results.LoginResult;
+import service.results.RegisterResult;
 
 import java.util.Objects;
 import java.util.UUID;
