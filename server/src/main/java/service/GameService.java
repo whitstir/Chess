@@ -9,6 +9,7 @@ import service.requests.CreateGameRequest;
 import service.requests.JoinGameRequest;
 import service.results.CreateGameResult;
 
+import java.util.Collection;
 import java.util.UUID;
 
 public class GameService {
@@ -65,5 +66,16 @@ public class GameService {
             game = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
         }
         dao.updateGame(game);
+    }
+
+    public Collection<GameData> listGames(String authToken) throws DataAccessException {
+        AuthData auth = dao.getAuth(authToken);
+        if (authToken == null || authToken.isEmpty()) {
+            throw new DataAccessException("");
+        }
+        if (auth == null) {
+            throw new DataAccessException("");
+        }
+        return dao.listGames();
     }
 }

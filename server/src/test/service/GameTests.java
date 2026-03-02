@@ -14,6 +14,8 @@ import service.results.CreateGameResult;
 
 import javax.xml.crypto.Data;
 
+import java.util.Collection;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameTests {
@@ -75,7 +77,29 @@ public class GameTests {
         String token = UserService.generateToken();
         testDAO.createAuth(new AuthData(token, "whitney"));
         JoinGameRequest testRequest = new JoinGameRequest(token, "WHITE", 5);
-        
+
         assertThrows(DataAccessException.class, () -> testService.joinGame(testRequest));
+    }
+
+    //My positive listGames test
+
+    @Test
+    public void listGamesSuccessfully() throws DataAccessException {
+        testDAO.createUser(new UserData("whitney", "12345", "email@email.com"));
+        String token = UserService.generateToken();
+        testDAO.createAuth(new AuthData(token, "whitney"));
+        testDAO.createGame(new GameData(1, null, null, "game1", null));
+        testDAO.createGame(new GameData(2, null, null, "game2", null));
+        testDAO.createGame(new GameData(3, null, null, "game3", null));
+        Collection<GameData> games = testService.listGames(token);
+
+        assertEquals(3, games.size());
+    }
+
+    //My negative listGames test
+
+    @Test
+    public void listGamesBadToken() throws DataAccessException {
+        assertThrows(DataAccessException.class, () -> testService.listGames("badToken"));
     }
 }
