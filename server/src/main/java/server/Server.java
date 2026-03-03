@@ -10,6 +10,10 @@ import service.ClearService;
 import service.GameService;
 import service.UserService;
 import io.javalin.http.Context;
+import service.requests.LoginRequest;
+import service.requests.RegisterRequest;
+import service.results.LoginResult;
+import service.results.RegisterResult;
 
 import javax.xml.crypto.Data;
 import java.util.Map;
@@ -45,7 +49,20 @@ public class Server {
     }
 
     private void register(Context ctx) throws DataAccessException {
-
+        RegisterRequest request = new Gson().fromJson(ctx.body(), RegisterRequest.class);
+        if (dao.getUser(request.username()) != null) {
+            ctx.status(403);
+            ctx.result(new Gson().toJson(Map.of("message", "Error: already taken")));
+        }
+        if (request.username() == null || request.username().isEmpty() ||
+                request.password() == null || request.password().isEmpty() ||
+                request.email() == null || request.email().isEmpty()) {
+            ctx.status(400);
+            ctx.result(new Gson().toJson(Map.of("message", "Error: bad request")));
+        }
+        RegisterResult result = userService.registerUser(request);
+        ctx.status(200);
+        ctx.result(new Gson().toJson(result));
     }
 
     private void login(Context ctx) throws DataAccessException {
