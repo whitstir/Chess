@@ -49,24 +49,32 @@ public class Server {
     }
 
     private void register(Context ctx) throws DataAccessException {
-        RegisterRequest request = new Gson().fromJson(ctx.body(), RegisterRequest.class);
-        if (dao.getUser(request.username()) != null) {
+        RegisterRequest registerRequest = new Gson().fromJson(ctx.body(), RegisterRequest.class);
+        if (dao.getUser(registerRequest.username()) != null) {
             ctx.status(403);
             ctx.result(new Gson().toJson(Map.of("message", "Error: already taken")));
         }
-        if (request.username() == null || request.username().isEmpty() ||
-                request.password() == null || request.password().isEmpty() ||
-                request.email() == null || request.email().isEmpty()) {
+        if (registerRequest.username() == null || registerRequest.username().isEmpty() ||
+                registerRequest.password() == null || registerRequest.password().isEmpty() ||
+                registerRequest.email() == null || registerRequest.email().isEmpty()) {
             ctx.status(400);
             ctx.result(new Gson().toJson(Map.of("message", "Error: bad request")));
         }
-        RegisterResult result = userService.registerUser(request);
+        RegisterResult result = userService.registerUser(registerRequest);
         ctx.status(200);
         ctx.result(new Gson().toJson(result));
     }
 
     private void login(Context ctx) throws DataAccessException {
-
+        LoginRequest loginRequest = new Gson().fromJson(ctx.body(), LoginRequest.class);
+        if (loginRequest.username() == null || loginRequest.username().isEmpty() ||
+            loginRequest.password() == null || loginRequest.password().isEmpty()) {
+            ctx.status(400);
+            ctx.result(new Gson().toJson(Map.of("message", "Error: bad request")));
+        }
+        LoginResult result = userService.login(loginRequest);
+        ctx.status(200);
+        ctx.result(new Gson().toJson(result));
     }
 
     private void logout(Context ctx) throws DataAccessException {
