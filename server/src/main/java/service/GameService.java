@@ -51,7 +51,7 @@ public class GameService {
 
         if (joinGameRequest.playerColor() == null || joinGameRequest.playerColor().isEmpty() ||
                 !joinGameRequest.playerColor().equals("WHITE") && !joinGameRequest.playerColor().equals("BLACK")) {
-            throw new DataAccessException("bad request");
+            throw new DataAccessException("Invalid input");
         }
         if (game == null) {
             throw new DataAccessException("No game found");
