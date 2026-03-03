@@ -6,17 +6,23 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import io.javalin.*;
 import model.AuthData;
+import model.GameData;
+import model.UserData;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
 import io.javalin.http.Context;
+import service.requests.CreateGameRequest;
 import service.requests.LoginRequest;
+import service.requests.LogoutRequest;
 import service.requests.RegisterRequest;
 import service.results.LoginResult;
 import service.results.RegisterResult;
 
 import javax.xml.crypto.Data;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 public class Server {
 
@@ -38,8 +44,26 @@ public class Server {
                 .exception(DataAccessException.class, this::exceptionHandler);
     }
 
-    private void exceptionHandler(DataAccessException ex, Context ctx) {
-
+    private void exceptionHandler(DataAccessException exception, Context ctx) {
+        int status;
+        String message;
+        if (exception.getMessage().equals("User already exists") || exception.getMessage().equals("This color is already taken")) {
+            status = 403;
+            message = "Error: already taken";
+        } else if (exception.getMessage().equals("Invalid input") || exception.getMessage().equals("No game found")) {
+            status = 400;
+            message = "Error: bad request";
+        } else if (exception.getMessage().equals("Unauthorized") || exception.getMessage().equals("Invalid auth token") ||
+                exception.getMessage().equals("Missing auth token") || exception.getMessage().equals("User does not exist") ||
+                exception.getMessage().equals("Incorrect password")) {
+            status = 401;
+            message = "Error: unauthorized";
+        } else {
+            status = 500;
+            message = "Error: " + exception.getMessage();
+        }
+        ctx.status(status);
+        ctx.result(new Gson().toJson(Map.of("message", message)));
     }
 
     private void clear(Context ctx) throws DataAccessException {
@@ -50,16 +74,6 @@ public class Server {
 
     private void register(Context ctx) throws DataAccessException {
         RegisterRequest registerRequest = new Gson().fromJson(ctx.body(), RegisterRequest.class);
-        if (dao.getUser(registerRequest.username()) != null) {
-            ctx.status(403);
-            ctx.result(new Gson().toJson(Map.of("message", "Error: already taken")));
-        }
-        if (registerRequest.username() == null || registerRequest.username().isEmpty() ||
-                registerRequest.password() == null || registerRequest.password().isEmpty() ||
-                registerRequest.email() == null || registerRequest.email().isEmpty()) {
-            ctx.status(400);
-            ctx.result(new Gson().toJson(Map.of("message", "Error: bad request")));
-        }
         RegisterResult result = userService.registerUser(registerRequest);
         ctx.status(200);
         ctx.result(new Gson().toJson(result));
@@ -67,18 +81,16 @@ public class Server {
 
     private void login(Context ctx) throws DataAccessException {
         LoginRequest loginRequest = new Gson().fromJson(ctx.body(), LoginRequest.class);
-        if (loginRequest.username() == null || loginRequest.username().isEmpty() ||
-            loginRequest.password() == null || loginRequest.password().isEmpty()) {
-            ctx.status(400);
-            ctx.result(new Gson().toJson(Map.of("message", "Error: bad request")));
-        }
         LoginResult result = userService.login(loginRequest);
         ctx.status(200);
         ctx.result(new Gson().toJson(result));
     }
 
     private void logout(Context ctx) throws DataAccessException {
-
+        String authToken = ctx.header("authorization");
+        userService.logout(new LogoutRequest(authToken));
+        ctx.status(200);
+        ctx.result("{}");
     }
 
     private void listGames(Context ctx) throws DataAccessException {

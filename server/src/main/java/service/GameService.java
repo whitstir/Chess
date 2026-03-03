@@ -27,7 +27,7 @@ public class GameService {
 
     public CreateGameResult createGame(CreateGameRequest gameRequest) throws DataAccessException {
         if (gameRequest.authToken() == null || dao.getAuth(gameRequest.authToken()) == null) {
-            throw new DataAccessException("");
+            throw new DataAccessException("Unauthorized");
         }
         if (gameRequest.gameName() == null || gameRequest.gameName().isEmpty()) {
             throw new DataAccessException("No game found");
@@ -45,14 +45,14 @@ public class GameService {
         String username = auth.username();
 
         if (joinGameRequest.authToken() == null || dao.getAuth(joinGameRequest.authToken()) == null) {
-            throw new DataAccessException("");
+            throw new DataAccessException("Unauthorized");
         }
         if (joinGameRequest.playerColor() == null || joinGameRequest.playerColor().isEmpty() ||
                 !joinGameRequest.playerColor().equals("WHITE") && !joinGameRequest.playerColor().equals("BLACK")) {
-            throw new DataAccessException("");
+            throw new DataAccessException("bad request");
         }
         if (game == null) {
-            throw new DataAccessException("");
+            throw new DataAccessException("No game found");
         }
         if (joinGameRequest.playerColor().equals("WHITE")) {
             if (game.whiteUsername() != null) {
