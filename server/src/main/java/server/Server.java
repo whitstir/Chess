@@ -42,18 +42,23 @@ public class Server {
         int status;
         String message;
 
-        if (exception.getMessage().equals("Bad request")) {
-            status = 400;
-            message = "Error: bad request";
-        } else if (exception.getMessage().equals("Already taken")) {
-            status = 403;
-            message = "Error: already taken";
-        } else if (exception.getMessage().equals("Unauthorized")) {
-            status = 401;
-            message = "Error: unauthorized";
-        } else {
-            status = 500;
-            message = "Error: " + exception.getMessage();
+        switch (exception.getMessage()) {
+            case "Bad request" -> {
+                status = 400;
+                message = "Error: bad request";
+            }
+            case "Already taken" -> {
+                status = 403;
+                message = "Error: already taken";
+            }
+            case "Unauthorized" -> {
+                status = 401;
+                message = "Error: unauthorized";
+            }
+            default -> {
+                status = 500;
+                message = "Error: " + exception.getMessage();
+            }
         }
 
         ctx.status(status);

@@ -10,7 +10,6 @@ import service.requests.JoinGameRequest;
 import service.results.CreateGameResult;
 
 import java.util.Collection;
-import java.util.UUID;
 
 public class GameService {
 
@@ -19,10 +18,6 @@ public class GameService {
 
     public GameService(DataAccess dao) {
         this.dao = dao;
-    }
-
-    public static String generateToken() {
-        return UUID.randomUUID().toString();
     }
 
     public CreateGameResult createGame(CreateGameRequest gameRequest) throws DataAccessException {
