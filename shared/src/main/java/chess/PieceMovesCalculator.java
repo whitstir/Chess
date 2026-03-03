@@ -14,32 +14,39 @@ public class PieceMovesCalculator {
         for (int[] direction : directions) {
             int newRow = row + direction[0];
             int newCol = col + direction[1];
-            if (piece.getPieceType() == ChessPiece.PieceType.QUEEN || piece.getPieceType() == ChessPiece.PieceType.BISHOP
-                    || piece.getPieceType() == ChessPiece.PieceType.ROOK) {
-                while (onBoard(newRow, newCol)) {
-                    ChessPosition newPosition = new ChessPosition(newRow, newCol);
-                    ChessPiece targetPiece = board.getPiece(newPosition);
-                    if (targetIsEmpty(targetPiece)) {
+            possibleMoves.addAll(findPieces(piece, newRow, newCol, board, direction, position));
+        }
+        return possibleMoves;
+    }
+
+    public Collection<ChessMove> findPieces(ChessPiece piece, int newRow, int newCol, ChessBoard board,
+                                            int[] direction, ChessPosition position) {
+        Collection<ChessMove> possibleMoves = new ArrayList<>();
+        if (piece.getPieceType() == ChessPiece.PieceType.QUEEN || piece.getPieceType() == ChessPiece.PieceType.BISHOP
+                || piece.getPieceType() == ChessPiece.PieceType.ROOK) {
+            while (onBoard(newRow, newCol)) {
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece targetPiece = board.getPiece(newPosition);
+                if (targetIsEmpty(targetPiece)) {
+                    possibleMoves.add(new ChessMove(position, newPosition, null));
+                } else {
+                    if (piece.getTeamColor() != targetPiece.getTeamColor()) {
                         possibleMoves.add(new ChessMove(position, newPosition, null));
-                    } else {
-                        if (piece.getTeamColor() != targetPiece.getTeamColor()) {
-                            possibleMoves.add(new ChessMove(position, newPosition, null));
-                        }
-                        break;
                     }
-                    newRow += direction[0];
-                    newCol += direction[1];
+                    break;
                 }
-            } else {
-                if (onBoard(newRow, newCol)) {
-                    ChessPosition newPosition = new ChessPosition(newRow, newCol);
-                    ChessPiece targetPiece = board.getPiece(newPosition);
-                    if (targetIsEmpty(targetPiece)) {
+                newRow += direction[0];
+                newCol += direction[1];
+            }
+        } else {
+            if (onBoard(newRow, newCol)) {
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece targetPiece = board.getPiece(newPosition);
+                if (targetIsEmpty(targetPiece)) {
+                    possibleMoves.add(new ChessMove(position, newPosition, null));
+                } else {
+                    if (piece.getTeamColor() != targetPiece.getTeamColor()) {
                         possibleMoves.add(new ChessMove(position, newPosition, null));
-                    } else {
-                        if (piece.getTeamColor() != targetPiece.getTeamColor()) {
-                            possibleMoves.add(new ChessMove(position, newPosition, null));
-                        }
                     }
                 }
             }
@@ -74,7 +81,7 @@ public class PieceMovesCalculator {
                 ChessPosition newPosition = new ChessPosition(newRow, newCol);
                 ChessPiece targetPiece = board.getPiece(newPosition);
                 if (!targetIsEmpty(targetPiece) && piece.getTeamColor() != targetPiece.getTeamColor()) {
-                    possibleMoves.addAll(findPawnPromotions(board, position, newPosition, newRow, piece));
+                    possibleMoves.addAll(findPawnPromotions(position, newPosition, newRow, piece));
                 }
             }
         }
@@ -117,10 +124,10 @@ public class PieceMovesCalculator {
                     if (!targetIsEmpty(middlePiece)) {
                         continue;
                     } else {
-                        possibleMoves.addAll(findPawnPromotions(board, position, newPosition, newRow, piece));
+                        possibleMoves.addAll(findPawnPromotions(position, newPosition, newRow, piece));
                     }
                 } else {
-                    possibleMoves.addAll(findPawnPromotions(board, position, newPosition, newRow, piece));
+                    possibleMoves.addAll(findPawnPromotions(position, newPosition, newRow, piece));
                 }
             }
 
@@ -128,7 +135,7 @@ public class PieceMovesCalculator {
         return possibleMoves;
     }
 
-    private Collection<ChessMove> findPawnPromotions(ChessBoard board, ChessPosition position, ChessPosition newPosition,
+    private Collection<ChessMove> findPawnPromotions(ChessPosition position, ChessPosition newPosition,
                                                      int row, ChessPiece piece) {
         Collection<ChessMove> possibleMoves = new ArrayList<>();
 
