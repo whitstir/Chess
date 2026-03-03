@@ -5,24 +5,18 @@ import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import io.javalin.*;
-import model.AuthData;
 import model.GameData;
-import model.UserData;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
 import io.javalin.http.Context;
-import service.requests.CreateGameRequest;
-import service.requests.LoginRequest;
-import service.requests.LogoutRequest;
-import service.requests.RegisterRequest;
+import service.requests.*;
+import service.results.CreateGameResult;
 import service.results.LoginResult;
 import service.results.RegisterResult;
 
-import javax.xml.crypto.Data;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
 
 public class Server {
 
@@ -47,12 +41,12 @@ public class Server {
     private void exceptionHandler(DataAccessException exception, Context ctx) {
         int status;
         String message;
-        if (exception.getMessage().equals("User already exists") || exception.getMessage().equals("This color is already taken")) {
-            status = 403;
-            message = "Error: already taken";
-        } else if (exception.getMessage().equals("Invalid input") || exception.getMessage().equals("No game found")) {
+        if (exception.getMessage().equals("Invalid input") || exception.getMessage().equals("No game found")) {
             status = 400;
             message = "Error: bad request";
+        } else if (exception.getMessage().equals("User already exists") || exception.getMessage().equals("This color is already taken")) {
+            status = 403;
+            message = "Error: already taken";
         } else if (exception.getMessage().equals("Unauthorized") || exception.getMessage().equals("Invalid auth token") ||
                 exception.getMessage().equals("Missing auth token") || exception.getMessage().equals("User does not exist") ||
                 exception.getMessage().equals("Incorrect password")) {
@@ -94,15 +88,29 @@ public class Server {
     }
 
     private void listGames(Context ctx) throws DataAccessException {
+        String authToken = ctx.header("authorization");
+        Collection<GameData> games = gameService.listGames(authToken);
+        ctx.status(200);
+        ctx.result(new Gson().toJson(Map.of("games", games)));
 
     }
 
     private void createGame(Context ctx) throws DataAccessException {
-
+        String authToken = ctx.header("authorization");
+        CreateGameRequest createGameRequest = new Gson().fromJson(ctx.body(), CreateGameRequest.class);
+        createGameRequest = new CreateGameRequest(createGameRequest.gameName(), authToken);
+        CreateGameResult result = gameService.createGame(createGameRequest);
+        ctx.status(200);
+        ctx.result(new Gson().toJson(result));
     }
 
     private void joinGame(Context ctx) throws DataAccessException {
-
+        String authToken = ctx.header("authorization");
+        JoinGameRequest joinGameRequest = new Gson().fromJson(ctx.body(), JoinGameRequest.class);
+        joinGameRequest = new JoinGameRequest(authToken, joinGameRequest.playerColor(), joinGameRequest.gameID());
+        gameService.joinGame(joinGameRequest);
+        ctx.status(200);
+        ctx.result("{}");
     }
 
     public int run(int desiredPort) {

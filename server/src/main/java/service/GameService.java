@@ -42,11 +42,13 @@ public class GameService {
     public void joinGame(JoinGameRequest joinGameRequest) throws DataAccessException {
         AuthData auth = dao.getAuth(joinGameRequest.authToken());
         GameData game = dao.getGame(joinGameRequest.gameID());
-        String username = auth.username();
 
         if (joinGameRequest.authToken() == null || dao.getAuth(joinGameRequest.authToken()) == null) {
             throw new DataAccessException("Unauthorized");
         }
+
+        String username = auth.username();
+
         if (joinGameRequest.playerColor() == null || joinGameRequest.playerColor().isEmpty() ||
                 !joinGameRequest.playerColor().equals("WHITE") && !joinGameRequest.playerColor().equals("BLACK")) {
             throw new DataAccessException("bad request");
@@ -71,10 +73,10 @@ public class GameService {
     public Collection<GameData> listGames(String authToken) throws DataAccessException {
         AuthData auth = dao.getAuth(authToken);
         if (authToken == null || authToken.isEmpty()) {
-            throw new DataAccessException("");
+            throw new DataAccessException("Unauthorized");
         }
         if (auth == null) {
-            throw new DataAccessException("");
+            throw new DataAccessException("Unauthorized");
         }
         return dao.listGames();
     }
