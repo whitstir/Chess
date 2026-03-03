@@ -6,9 +6,9 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import io.javalin.*;
 import model.GameData;
-import service.ClearService;
-import service.GameService;
-import service.UserService;
+import service.mainServices.ClearService;
+import service.mainServices.GameService;
+import service.mainServices.UserService;
 import io.javalin.http.Context;
 import service.requests.*;
 import service.results.CreateGameResult;
@@ -41,27 +41,28 @@ public class Server {
     private void exceptionHandler(DataAccessException exception, Context ctx) {
         int status;
         String message;
-        if (exception.getMessage().equals("Invalid input") || exception.getMessage().equals("No game found")) {
+
+        if (exception.getMessage().equals("Bad request")) {
             status = 400;
             message = "Error: bad request";
-        } else if (exception.getMessage().equals("User already exists") || exception.getMessage().equals("This color is already taken")) {
+        } else if (exception.getMessage().equals("Already taken")) {
             status = 403;
             message = "Error: already taken";
-        } else if (exception.getMessage().equals("Unauthorized") || exception.getMessage().equals("Invalid auth token") ||
-                exception.getMessage().equals("Missing auth token") || exception.getMessage().equals("User does not exist") ||
-                exception.getMessage().equals("Incorrect password")) {
+        } else if (exception.getMessage().equals("Unauthorized")) {
             status = 401;
             message = "Error: unauthorized";
         } else {
             status = 500;
             message = "Error: " + exception.getMessage();
         }
+
         ctx.status(status);
         ctx.result(new Gson().toJson(Map.of("message", message)));
     }
 
     private void clear(Context ctx) throws DataAccessException {
         clearService.clear();
+
         ctx.status(200);
         ctx.result("{}");
     }
@@ -69,6 +70,7 @@ public class Server {
     private void register(Context ctx) throws DataAccessException {
         RegisterRequest registerRequest = new Gson().fromJson(ctx.body(), RegisterRequest.class);
         RegisterResult result = userService.registerUser(registerRequest);
+
         ctx.status(200);
         ctx.result(new Gson().toJson(result));
     }
@@ -76,6 +78,7 @@ public class Server {
     private void login(Context ctx) throws DataAccessException {
         LoginRequest loginRequest = new Gson().fromJson(ctx.body(), LoginRequest.class);
         LoginResult result = userService.login(loginRequest);
+
         ctx.status(200);
         ctx.result(new Gson().toJson(result));
     }
@@ -83,6 +86,7 @@ public class Server {
     private void logout(Context ctx) throws DataAccessException {
         String authToken = ctx.header("authorization");
         userService.logout(new LogoutRequest(authToken));
+
         ctx.status(200);
         ctx.result("{}");
     }
@@ -90,6 +94,7 @@ public class Server {
     private void listGames(Context ctx) throws DataAccessException {
         String authToken = ctx.header("authorization");
         Collection<GameData> games = gameService.listGames(authToken);
+
         ctx.status(200);
         ctx.result(new Gson().toJson(Map.of("games", games)));
 
@@ -100,6 +105,7 @@ public class Server {
         CreateGameRequest createGameRequest = new Gson().fromJson(ctx.body(), CreateGameRequest.class);
         createGameRequest = new CreateGameRequest(createGameRequest.gameName(), authToken);
         CreateGameResult result = gameService.createGame(createGameRequest);
+
         ctx.status(200);
         ctx.result(new Gson().toJson(result));
     }
@@ -109,6 +115,7 @@ public class Server {
         JoinGameRequest joinGameRequest = new Gson().fromJson(ctx.body(), JoinGameRequest.class);
         joinGameRequest = new JoinGameRequest(authToken, joinGameRequest.playerColor(), joinGameRequest.gameID());
         gameService.joinGame(joinGameRequest);
+
         ctx.status(200);
         ctx.result("{}");
     }

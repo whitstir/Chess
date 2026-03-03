@@ -1,4 +1,4 @@
-package service;
+package service.mainServices;
 
 import chess.ChessGame;
 import dataaccess.DataAccess;
@@ -30,12 +30,13 @@ public class GameService {
             throw new DataAccessException("Unauthorized");
         }
         if (gameRequest.gameName() == null || gameRequest.gameName().isEmpty()) {
-            throw new DataAccessException("No game found");
+            throw new DataAccessException("Bad request");
         }
+
         int newID = nextGameID++;
-        GameData newGame = new GameData(newID, null, null, gameRequest.gameName(),
-                new ChessGame());
+        GameData newGame = new GameData(newID, null, null, gameRequest.gameName(), new ChessGame());
         dao.createGame(newGame);
+
         return new CreateGameResult(newID);
     }
 
@@ -51,33 +52,36 @@ public class GameService {
 
         if (joinGameRequest.playerColor() == null || joinGameRequest.playerColor().isEmpty() ||
                 !joinGameRequest.playerColor().equals("WHITE") && !joinGameRequest.playerColor().equals("BLACK")) {
-            throw new DataAccessException("Invalid input");
+            throw new DataAccessException("Bad request");
         }
         if (game == null) {
-            throw new DataAccessException("No game found");
+            throw new DataAccessException("Bad request");
         }
         if (joinGameRequest.playerColor().equals("WHITE")) {
             if (game.whiteUsername() != null) {
-                throw new DataAccessException("This color is already taken");
+                throw new DataAccessException("Already taken");
             }
             game = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
         } else {
             if (game.blackUsername() != null) {
-                throw new DataAccessException("This color is already taken");
+                throw new DataAccessException("Already taken");
             }
             game = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
         }
+
         dao.updateGame(game);
     }
 
     public Collection<GameData> listGames(String authToken) throws DataAccessException {
         AuthData auth = dao.getAuth(authToken);
+
         if (authToken == null || authToken.isEmpty()) {
             throw new DataAccessException("Unauthorized");
         }
         if (auth == null) {
             throw new DataAccessException("Unauthorized");
         }
+
         return dao.listGames();
     }
 }

@@ -1,4 +1,4 @@
-package service;
+package service.mainServices;
 
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
@@ -27,16 +27,16 @@ public class UserService {
 
     public RegisterResult registerUser(RegisterRequest registerRequest) throws DataAccessException {
         if (registerRequest.username() == null || registerRequest.username().isEmpty() ||
-            registerRequest.password() == null || registerRequest.password().isEmpty() ||
-            registerRequest.email() == null || registerRequest.email().isEmpty()) {
-            throw new DataAccessException("Invalid input");
+                registerRequest.password() == null || registerRequest.password().isEmpty() ||
+                registerRequest.email() == null || registerRequest.email().isEmpty()) {
+            throw new DataAccessException("Bad request");
         }
         if (dao.getUser(registerRequest.username()) != null) {
-            throw new DataAccessException("User already exists");
+            throw new DataAccessException("Already taken");
         }
+
         UserData newUser = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
         dao.createUser(newUser);
-
         String token = generateToken();
         dao.createAuth(new AuthData(token, newUser.username()));
 
@@ -45,15 +45,17 @@ public class UserService {
 
     public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
         if (loginRequest.username() == null || loginRequest.username().isEmpty() ||
-            loginRequest.password() == null || loginRequest.password().isEmpty()) {
-            throw new DataAccessException("Invalid input");
+                loginRequest.password() == null || loginRequest.password().isEmpty()) {
+            throw new DataAccessException("Bad request");
         }
+
         UserData newUser = dao.getUser(loginRequest.username());
+
         if (newUser == null) {
-            throw new DataAccessException("User does not exist");
+            throw new DataAccessException("Unauthorized");
         }
         if (!Objects.equals(newUser.password(), loginRequest.password())) {
-            throw new DataAccessException("Incorrect password");
+            throw new DataAccessException("Unauthorized");
         }
 
         String token = generateToken();
@@ -64,12 +66,15 @@ public class UserService {
 
     public void logout(LogoutRequest logoutRequest) throws DataAccessException {
         if (logoutRequest.authToken() == null || logoutRequest.authToken().isEmpty()) {
-            throw new DataAccessException("Missing auth token");
+            throw new DataAccessException("Unauthorized");
         }
+
         AuthData auth = dao.getAuth(logoutRequest.authToken());
+
         if (auth == null) {
-            throw new DataAccessException("Invalid auth token");
+            throw new DataAccessException("Unauthorized");
         }
+
         dao.deleteAuth(logoutRequest.authToken());
     }
 }

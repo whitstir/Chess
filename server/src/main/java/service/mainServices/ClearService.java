@@ -1,4 +1,4 @@
-package service;
+package service.mainServices;
 
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
