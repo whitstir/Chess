@@ -11,7 +11,7 @@ public class MySqlDataAccess implements DataAccess {
 
     }
 
-    public void createUser(UserData user) {
+    public void createUser(UserData user) throws DataAccessException {
 
     }
 
@@ -31,7 +31,7 @@ public class MySqlDataAccess implements DataAccess {
 
     }
 
-    public void updateGame(GameData game) {
+    public void updateGame(GameData game) throws DataAccessException {
 
     }
 
