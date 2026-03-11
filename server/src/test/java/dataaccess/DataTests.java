@@ -28,7 +28,6 @@ public class DataTests {
     @Test
     public void getUserSuccess() throws DataAccessException {
         UserData testUser = new UserData("whit", "123", "email@email.com");
-        UserData testResult = sqlDao.getUser("whit");
         UserData user = sqlDao.getUser("whit");
 
         assertNotNull(user);
@@ -85,5 +84,22 @@ public class DataTests {
         AuthData testAuthTwo = new AuthData("123", "whitney");
 
         assertThrows(DataAccessException.class, () -> sqlDao.createAuth(testAuthTwo));
+    }
+
+    @Test
+    public void getAuthSuccess() throws DataAccessException {
+        AuthData testAuth = new AuthData("123", "whit");
+        AuthData auth = sqlDao.getAuth("123");
+
+        assertNotNull(auth);
+        assertEquals(testAuth.username(), auth.username());
+        assertEquals(testAuth.authToken(), auth.authToken());
+    }
+
+    @Test
+    public void getAuthFail() throws DataAccessException {
+        AuthData testResult = sqlDao.getAuth("badToken");
+
+        assertNull(testResult);
     }
 }
