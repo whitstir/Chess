@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
+import dataaccess.MySqlDataAccess;
 import io.javalin.*;
 import model.GameData;
 import service.ClearService;
@@ -21,7 +22,16 @@ import java.util.Map;
 public class Server {
 
     private final Javalin javalin;
-    private final DataAccess dao = new MemoryDataAccess();
+    private final DataAccess dao;
+
+    {
+        try {
+            dao = new MySqlDataAccess();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private final ClearService clearService = new ClearService(dao);
     private final UserService userService = new UserService(dao);
     private final GameService gameService = new GameService(dao);

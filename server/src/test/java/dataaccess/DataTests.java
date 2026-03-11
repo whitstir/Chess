@@ -1,6 +1,8 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -103,5 +105,57 @@ public class DataTests {
         AuthData testResult = sqlDao.getAuth("badToken");
 
         assertNull(testResult);
+    }
+
+    @Test
+    public void createGameSuccess() throws DataAccessException {
+        ChessGame game = new ChessGame();
+        GameData gameData = new GameData(0, "white", "black", "game1", game);
+        sqlDao.createGame(gameData);
+        GameData savedGame = sqlDao.listGames().iterator().next();
+
+        assertNotNull(savedGame);
+        assertNotNull(savedGame.game());
+        assertEquals("white", savedGame.whiteUsername());
+        assertEquals("black", savedGame.blackUsername());
+        assertEquals("game1", savedGame.gameName());
+    }
+
+    @Test
+    public void createGameFail() throws DataAccessException {
+        ChessGame game = new ChessGame();
+        GameData gameData = new GameData(0, "white", "black", null, game);
+
+        assertThrows(DataAccessException.class, () -> sqlDao.createGame(gameData));
+    }
+
+    @Test
+    public void getGameSuccess() throws DataAccessException {
+
+    }
+
+    @Test
+    public void getGameFail() throws DataAccessException {
+
+    }
+
+    @Test
+    public void listGamesSuccess() throws DataAccessException {
+
+    }
+
+    @Test
+    public void listGamesFail() throws DataAccessException {
+
+    }
+
+    @Test
+    public void updateGameSuccess() throws DataAccessException {
+
+    }
+
+    @Test
+    public void updateGameFail() throws DataAccessException {
+
     }
 }
