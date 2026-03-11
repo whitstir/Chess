@@ -50,8 +50,10 @@ public class MySqlDataAccess implements DataAccess {
         return null;
     }
 
-    public void createGame(GameData game) {
-
+    public void createGame(GameData game) throws DataAccessException {
+        var statement = "INSERT INTO game (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
+        String json = new Gson().toJson(game.game());
+        executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), json);
     }
 
     public GameData getGame(int gameID) {
