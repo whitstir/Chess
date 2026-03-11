@@ -1,9 +1,12 @@
 package dataaccess;
 
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
+
+import javax.xml.crypto.Data;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,6 +18,11 @@ public class DataTests {
     public void setup() throws DataAccessException {
         sqlDao = new MySqlDataAccess();
         sqlDao.clear();
+    }
+
+    @Test
+    public void clearSuccess() {
+
     }
 
     @Test
@@ -57,5 +65,25 @@ public class DataTests {
         UserData testUserTwo = new UserData("whit", "12345", "email@gmail.com");
 
         assertThrows(DataAccessException.class, () -> sqlDao.createUser(testUserTwo));
+    }
+
+    @Test
+    public void createAuthSuccess() throws DataAccessException {
+        AuthData testAuth = new AuthData("123", "whit");
+        sqlDao.createAuth(testAuth);
+        AuthData auth = sqlDao.getAuth("123");
+
+        assertNotNull(auth);
+        assertEquals(testAuth.authToken(), auth.authToken());
+        assertEquals(testAuth.username(), auth.username());
+    }
+
+    @Test
+    public void createAuthFail() throws DataAccessException {
+        AuthData testAuthOne = new AuthData("123", "whit");
+        sqlDao.createAuth(testAuthOne);
+        AuthData testAuthTwo = new AuthData("123", "whitney");
+
+        assertThrows(DataAccessException.class, () -> sqlDao.createAuth(testAuthTwo));
     }
 }
