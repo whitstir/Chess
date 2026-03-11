@@ -93,7 +93,9 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     public void updateGame(GameData game) throws DataAccessException {
-
+        var statement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameId = ?";
+        String json = new Gson().toJson(game.game());
+        executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), json, game.gameID());
     }
 
     public void createAuth(AuthData auth) throws DataAccessException {
@@ -205,7 +207,7 @@ public class MySqlDataAccess implements DataAccess {
         var whiteUsername = rs.getString("whiteUsername");
         var blackUsername = rs.getString("blackUsername");
         var gameName = rs.getString("gameName");
-        String json = new Gson().toJson(rs.getString("game"));
+        String json = rs.getString("game");
         ChessGame game = new Gson().fromJson(json, ChessGame.class);
         return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
     }
