@@ -21,8 +21,10 @@ public class MySqlDataAccess implements DataAccess {
         configureDatabase();
     }
 
-    public void clear() {
-
+    public void clear() throws DataAccessException {
+        executeUpdate("TRUNCATE user");
+        executeUpdate("TRUNCATE auth");
+        executeUpdate("TRUNCATE game");
     }
 
     public void createUser(UserData user) throws DataAccessException {
@@ -64,16 +66,31 @@ public class MySqlDataAccess implements DataAccess {
 
     }
 
-    public void createAuth(AuthData auth) {
-
+    public void createAuth(AuthData auth) throws DataAccessException {
+        var statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
+        executeUpdate(statement, auth.authToken(), auth.username());
     }
 
-    public AuthData getAuth(String authToken) {
-
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT authToken, username FROM auth WHERE authToken=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authToken);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readAuth(rs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return null;
     }
 
-    public void deleteAuth(String authToken) {
-
+    public void deleteAuth(String authToken) throws DataAccessException {
+        var statement = "DELETE FROM auth WHERE authToken=?";
+        executeUpdate(statement, authToken);
     }
 
     private final String[] createStatements = {
@@ -145,5 +162,11 @@ public class MySqlDataAccess implements DataAccess {
         var password = rs.getString("password");
         var email = rs.getString("email");
         return new UserData(username, password, email);
+    }
+
+    private AuthData readAuth(ResultSet rs) throws SQLException {
+        var authToken = rs.getString("authToken");
+        var username = rs.getString("username");
+        return new AuthData(authToken, username);
     }
 }
