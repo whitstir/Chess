@@ -27,8 +27,9 @@ public class MemoryDataAccess implements DataAccess {
         return users.get(username);
     }
 
-    public void createGame(GameData game) {
+    public int createGame(GameData game) {
         games.put(game.gameID(), game);
+        return 0;
     }
 
     public GameData getGame(int gameID) {

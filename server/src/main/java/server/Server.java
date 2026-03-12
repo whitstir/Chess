@@ -23,7 +23,6 @@ public class Server {
 
     private final Javalin javalin;
     private final DataAccess dao;
-
     {
         try {
             dao = new MySqlDataAccess();
@@ -31,7 +30,6 @@ public class Server {
             throw new RuntimeException(e);
         }
     }
-
     private final ClearService clearService = new ClearService(dao);
     private final UserService userService = new UserService(dao);
     private final GameService gameService = new GameService(dao);

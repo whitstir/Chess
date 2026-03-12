@@ -31,8 +31,7 @@ public class MySqlDataAccess implements DataAccess {
 
     public void createUser(UserData user) throws DataAccessException {
         var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
-        executeUpdate(statement, user.username(), hashedPassword, user.email());
+        executeUpdate(statement, user.username(), user.password(), user.email());
     }
 
     public UserData getUser(String username) throws DataAccessException {
@@ -52,10 +51,10 @@ public class MySqlDataAccess implements DataAccess {
         return null;
     }
 
-    public void createGame(GameData game) throws DataAccessException {
+    public int createGame(GameData game) throws DataAccessException {
         var statement = "INSERT INTO game (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
         String json = new Gson().toJson(game.game());
-        executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), json);
+        return executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), json);
     }
 
     public GameData getGame(int gameID) throws DataAccessException {

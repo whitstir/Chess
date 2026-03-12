@@ -28,7 +28,8 @@ public class DataTests {
 
     @Test
     public void getUserSuccess() throws DataAccessException {
-        UserData testUser = new UserData("whit", "123", "email@email.com");
+        String hashedPassword = BCrypt.hashpw("123", BCrypt.gensalt());
+        UserData testUser = new UserData("whit", hashedPassword, "email@email.com");
         sqlDao.createUser(testUser);
         UserData user = sqlDao.getUser("whit");
 
@@ -48,13 +49,13 @@ public class DataTests {
 
     @Test
     public void createUserSuccess() throws DataAccessException {
-        UserData testUser = new UserData("whit", "123", "email@email.com");
+        String hashedPassword = BCrypt.hashpw("123", BCrypt.gensalt());
+        UserData testUser = new UserData("whit", hashedPassword, "email@email.com");
         sqlDao.createUser(testUser);
         UserData user = sqlDao.getUser("whit");
 
         assertNotNull(user);
         assertEquals(testUser.username(), user.username());
-        assertNotEquals(testUser.password(), user.password());
         assertEquals(testUser.email(), user.email());
         assertTrue(BCrypt.checkpw("123", user.password()));
     }

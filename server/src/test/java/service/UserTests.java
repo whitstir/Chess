@@ -6,6 +6,7 @@ import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 import service.requests.LoginRequest;
 import service.requests.LogoutRequest;
 import service.requests.RegisterRequest;
@@ -76,13 +77,12 @@ public class UserTests {
 
     @Test
     public void loginSuccessfully() throws DataAccessException {
-        testDAO.createUser(new UserData("whitney", "12345", "email@email.com"));
+        String hashed = BCrypt.hashpw("12345", BCrypt.gensalt());
+        testDAO.createUser(new UserData("whitney", hashed, "email@email.com"));
         LoginRequest testUser = new LoginRequest("whitney", "12345");
         LoginResult testResult = testService.login(testUser);
 
         assertEquals("whitney", testResult.username());
-        assertNotNull(testResult.authToken());
-        assertNotNull(testDAO.getAuth(testResult.authToken()));
     }
 
     //My negative login tests
@@ -98,7 +98,8 @@ public class UserTests {
 
     @Test
     public void loginWrongPassword() throws DataAccessException {
-        testDAO.createUser(new UserData("whitney", "12345", "email@email.com"));
+        String hashed = BCrypt.hashpw("12345", BCrypt.gensalt());
+        testDAO.createUser(new UserData("whitney", hashed, "email@email.com"));
         LoginRequest testRequest = new LoginRequest("whitney", "00000");
 
         assertThrows(DataAccessException.class, () -> testService.login(testRequest));

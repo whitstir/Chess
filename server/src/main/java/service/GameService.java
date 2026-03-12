@@ -28,9 +28,8 @@ public class GameService {
             throw new DataAccessException("Bad request");
         }
 
-        int newID = nextGameID++;
-        GameData newGame = new GameData(newID, null, null, gameRequest.gameName(), new ChessGame());
-        dao.createGame(newGame);
+        GameData newGame = new GameData(0, null, null, gameRequest.gameName(), new ChessGame());
+        int newID = dao.createGame(newGame);
 
         return new CreateGameResult(newID);
     }

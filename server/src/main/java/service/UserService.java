@@ -36,7 +36,9 @@ public class UserService {
             throw new DataAccessException("Already taken");
         }
 
-        UserData newUser = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
+        String hashedPassword = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
+
+        UserData newUser = new UserData(registerRequest.username(), hashedPassword, registerRequest.email());
         dao.createUser(newUser);
         String token = generateToken();
         dao.createAuth(new AuthData(token, newUser.username()));

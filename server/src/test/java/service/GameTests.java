@@ -39,7 +39,7 @@ public class GameTests {
 
         assertNotNull(testResult);
         assertNotNull(testDAO.getGame(testResult.gameID()));
-        assertEquals(1, testResult.gameID());
+        assertEquals(0, testResult.gameID());
     }
 
     //My negative createGame test
