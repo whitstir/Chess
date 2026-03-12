@@ -7,6 +7,8 @@ import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
+import service.ClearService;
+
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,8 +24,25 @@ public class DataTests {
     }
 
     @Test
-    public void clearSuccess() {
+    public void clearSuccess() throws DataAccessException {
+        UserData user = new UserData("user1", BCrypt.hashpw("123", BCrypt.gensalt()), "email1");
+        sqlDao.createUser(user);
+        AuthData auth = new AuthData("token123", "user1");
+        sqlDao.createAuth(auth);
+        GameData game = new GameData(0, "user1", null,
+                "game1", new ChessGame());
+        sqlDao.createGame(game);
 
+        assertNotNull(sqlDao.getUser("user1"));
+        assertNotNull(sqlDao.getAuth("token123"));
+        assertEquals(1, sqlDao.listGames().size());
+
+        ClearService clearService = new ClearService(sqlDao);
+        clearService.clear();
+
+        assertNull(sqlDao.getUser("user1"));
+        assertNull(sqlDao.getAuth("token123"));
+        assertEquals(0, sqlDao.listGames().size());
     }
 
     @Test
