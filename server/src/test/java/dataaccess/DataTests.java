@@ -7,9 +7,6 @@ import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
-
-import javax.xml.crypto.Data;
-
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -138,7 +135,8 @@ public class DataTests {
     @Test
     public void createGameSuccess() throws DataAccessException {
         ChessGame game = new ChessGame();
-        GameData gameData = new GameData(0, "white", "black", "game1", game);
+        GameData gameData = new GameData(0, "white", "black",
+                "game1", game);
         sqlDao.createGame(gameData);
         GameData savedGame = sqlDao.listGames().iterator().next();
 
@@ -150,7 +148,7 @@ public class DataTests {
     }
 
     @Test
-    public void createGameFail() throws DataAccessException {
+    public void createGameFail() {
         ChessGame game = new ChessGame();
         GameData gameData = new GameData(0, "white", "black", null, game);
 
@@ -160,7 +158,8 @@ public class DataTests {
     @Test
     public void getGameSuccess() throws DataAccessException {
         ChessGame game = new ChessGame();
-        GameData gameData = new GameData(0, "white", "black", "game1", game);
+        GameData gameData = new GameData(0, "white", "black",
+                "game1", game);
         sqlDao.createGame(gameData);
         GameData savedGame = sqlDao.listGames().iterator().next();
         GameData foundGame = sqlDao.getGame(savedGame.gameID());
@@ -182,8 +181,10 @@ public class DataTests {
     public void listGamesSuccess() throws DataAccessException {
         ChessGame game1 = new ChessGame();
         ChessGame game2 = new ChessGame();
-        sqlDao.createGame(new GameData(0, "white1", "black1", "game1", game1));
-        sqlDao.createGame(new GameData(0, "white2", "black2", "game2", game2));
+        sqlDao.createGame(new GameData(0, "white1", "black1",
+                "game1", game1));
+        sqlDao.createGame(new GameData(0, "white2", "black2",
+                "game2", game2));
         Collection<GameData> games = sqlDao.listGames();
 
         assertEquals(2, games.size());
@@ -199,9 +200,11 @@ public class DataTests {
     @Test
     public void updateGameSuccess() throws DataAccessException {
         ChessGame game = new ChessGame();
-        sqlDao.createGame(new GameData(0, "white", "black", "game1", game));
+        sqlDao.createGame(new GameData(0, "white", "black",
+                "game1", game));
         GameData savedGame = sqlDao.listGames().iterator().next();
-        GameData updatedGame = new GameData(savedGame.gameID(), "newWhite", "newBlack", "game1", game);
+        GameData updatedGame = new GameData(savedGame.gameID(), "newWhite", "newBlack",
+                "game1", game);
         sqlDao.updateGame(updatedGame);
         GameData updateResult = sqlDao.getGame(savedGame.gameID());
 
@@ -213,7 +216,8 @@ public class DataTests {
     @Test
     public void updateGameFail() throws DataAccessException {
         ChessGame game = new ChessGame();
-        GameData gameData = new GameData(100, "white", "black", "badGame", game);
+        GameData gameData = new GameData(100, "white", "black",
+                "badGame", game);
         sqlDao.updateGame(gameData);
         GameData updateResult = sqlDao.getGame(100);
 

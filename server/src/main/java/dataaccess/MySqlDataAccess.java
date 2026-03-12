@@ -93,7 +93,7 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     public void updateGame(GameData game) throws DataAccessException {
-        var statement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameId = ?";
+        var statement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?";
         String json = new Gson().toJson(game.game());
         executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), json, game.gameID());
     }
@@ -185,7 +185,7 @@ public class MySqlDataAccess implements DataAccess {
                 return 0;
             }
         } catch (SQLException e) {
-            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
+            throw new DataAccessException(String.format("can't update database: %s, %s", statement, e.getMessage()));
         }
     }
 
