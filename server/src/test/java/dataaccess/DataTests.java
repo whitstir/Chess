@@ -10,6 +10,8 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import javax.xml.crypto.Data;
 
+import java.util.Collection;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DataTests {
@@ -108,6 +110,32 @@ public class DataTests {
     }
 
     @Test
+    public void deleteAuthSuccess() throws DataAccessException {
+        AuthData testAuth = new AuthData("123", "whit");
+        sqlDao.createAuth(testAuth);
+        AuthData testExisting = sqlDao.getAuth(testAuth.authToken());
+
+        assertNotNull(testExisting);
+
+        sqlDao.deleteAuth(testAuth.authToken());
+        AuthData deletedAuth = sqlDao.getAuth(testAuth.authToken());
+
+        assertNull(deletedAuth);
+    }
+
+    @Test
+    public void deleteAuthFail() throws DataAccessException {
+        AuthData testNotExisting = sqlDao.getAuth("badToken");
+
+        assertNull(testNotExisting);
+
+        sqlDao.deleteAuth("badToken");
+        AuthData testStillNotExisting = sqlDao.getAuth("badToken");
+
+        assertNull(testStillNotExisting);
+    }
+
+    @Test
     public void createGameSuccess() throws DataAccessException {
         ChessGame game = new ChessGame();
         GameData gameData = new GameData(0, "white", "black", "game1", game);
@@ -131,31 +159,65 @@ public class DataTests {
 
     @Test
     public void getGameSuccess() throws DataAccessException {
+        ChessGame game = new ChessGame();
+        GameData gameData = new GameData(0, "white", "black", "game1", game);
+        sqlDao.createGame(gameData);
+        GameData savedGame = sqlDao.listGames().iterator().next();
+        GameData foundGame = sqlDao.getGame(savedGame.gameID());
 
+        assertNotNull(foundGame);
+        assertEquals("game1", foundGame.gameName());
+        assertEquals("white", foundGame.whiteUsername());
+        assertEquals("black", foundGame.blackUsername());
     }
 
     @Test
     public void getGameFail() throws DataAccessException {
+        GameData game = sqlDao.getGame(1234);
 
+        assertNull(game);
     }
 
     @Test
     public void listGamesSuccess() throws DataAccessException {
+        ChessGame game1 = new ChessGame();
+        ChessGame game2 = new ChessGame();
+        sqlDao.createGame(new GameData(0, "white1", "black1", "game1", game1));
+        sqlDao.createGame(new GameData(0, "white2", "black2", "game2", game2));
+        Collection<GameData> games = sqlDao.listGames();
 
+        assertEquals(2, games.size());
     }
 
     @Test
     public void listGamesFail() throws DataAccessException {
+        Collection<GameData> games = sqlDao.listGames();
 
+        assertTrue(games.isEmpty());
     }
 
     @Test
     public void updateGameSuccess() throws DataAccessException {
+        ChessGame game = new ChessGame();
+        sqlDao.createGame(new GameData(0, "white", "black", "game1", game));
+        GameData savedGame = sqlDao.listGames().iterator().next();
+        GameData updatedGame = new GameData(savedGame.gameID(), "newWhite", "newBlack", "game1", game);
+        sqlDao.updateGame(updatedGame);
+        GameData updateResult = sqlDao.getGame(savedGame.gameID());
+
+        assertEquals("newWhite", updateResult.whiteUsername());
+        assertEquals("newBlack", updateResult.blackUsername());
 
     }
 
     @Test
     public void updateGameFail() throws DataAccessException {
+        ChessGame game = new ChessGame();
+        GameData gameData = new GameData(100, "white", "black", "badGame", game);
+        sqlDao.updateGame(gameData);
+        GameData updateResult = sqlDao.getGame(100);
 
+        assertNull(updateResult);
     }
+
 }
