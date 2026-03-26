@@ -46,6 +46,15 @@ public class ServerFacade {
         return auth;
     }
 
+    public AuthData login(String username, String password) throws URISyntaxException, IOException {
+        var body = Map.of("username", username, "password", password);
+        String response = request("POST", "/session", gson.toJson(body));
+        AuthData auth = gson.fromJson(response, AuthData.class);
+        this.authToken = auth.authToken();
+
+        return auth;
+    }
+
     private String request(String method, String endpoint, String body) throws URISyntaxException, IOException {
         URI uri = new URI(serverUrl + endpoint);
         HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
