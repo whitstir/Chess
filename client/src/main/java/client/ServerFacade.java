@@ -55,6 +55,11 @@ public class ServerFacade {
         return auth;
     }
 
+    public void logout() throws URISyntaxException, IOException {
+        request("DELETE", "/session", null);
+        this.authToken = null;
+    }
+
     private String request(String method, String endpoint, String body) throws URISyntaxException, IOException {
         URI uri = new URI(serverUrl + endpoint);
         HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
