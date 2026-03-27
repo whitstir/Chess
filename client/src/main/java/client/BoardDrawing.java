@@ -25,6 +25,7 @@ public class BoardDrawing {
     }
 
     private void makeSquare(ChessGame game, int row, int col) {
+
     }
 
     private void drawBlackBoard(ChessGame game) {
@@ -40,10 +41,18 @@ public class BoardDrawing {
     }
 
     private void printColumnsWhite() {
-
+        System.out.print("   ");
+        for (char c = 'a'; c < 'i'; c++) {
+            System.out.print(" " + c + " ");
+        }
+        System.out.println();
     }
 
     private void printColumnsBlack() {
-
+        System.out.print("   ");
+        for (char c = 'h'; c >= 'a'; c--) {
+            System.out.print(" " + c + " ");
+        }
+        System.out.println();
     }
 }
