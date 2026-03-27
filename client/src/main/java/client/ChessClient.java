@@ -1,14 +1,14 @@
 package client;
 
+import chess.ChessGame;
 import model.GameData;
+import client.BoardDrawing;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
+import static java.lang.String.valueOf;
 import static java.lang.System.out;
 
 public class ChessClient {
@@ -32,10 +32,9 @@ public class ChessClient {
         }
     }
 
-
     private void preLogin() {
         String[] input = getInput();
-        switch (input[0]) {
+        switch (input[0].toLowerCase()) {
             case "help" -> {
                 printRegister();
                 printLogin();
@@ -74,7 +73,7 @@ public class ChessClient {
 
     private void postLogin() throws URISyntaxException, IOException {
         String[] input = getInput();
-        switch (input[0]) {
+        switch (input[0].toLowerCase()) {
             case "create" -> {
                 if (input.length != 2) {
                     out.println("Please enter a game name");
@@ -113,15 +112,13 @@ public class ChessClient {
                     out.println("Could not retrieve games list.");
                 }
             }
-
             case "join" -> {
                 if (input.length != 3) {
-                    out.println("Please enter a game id and your player color");
+                    out.println("Please enter a game number and your player color");
                     printJoin();
                     break;
                 }
-                if (!input[2].equalsIgnoreCase("WHITE") &&
-                        !input[2].equalsIgnoreCase("BLACK")) {
+                if (!input[2].equalsIgnoreCase("WHITE") && !input[2].equalsIgnoreCase("BLACK")) {
                     out.println("Color must be WHITE or BLACK");
                     return;
                 }
@@ -133,9 +130,13 @@ public class ChessClient {
                         return;
                     }
                     serverFacade.joinGame(input[2], gameID);
+                    Collection<GameData> games = serverFacade.listGames();
+                    GameData target = games.stream().filter(g -> g.gameID() == gameID)
+                                           .findFirst().orElseThrow(() -> new RuntimeException("Game not found"));
+                    BoardDrawing.drawBoard(target.game(), ChessGame.TeamColor.valueOf(input[2].toUpperCase()));
                     out.println("Successfully joined game " + index);
                 } catch (Exception e) {
-                    out.println("Invalid inputs");
+                    out.println("Could not join game. Please try again.");
                     printJoin();
                 }
             }
@@ -152,10 +153,13 @@ public class ChessClient {
                         out.println("Invalid game number. Run 'list' first.");
                         return;
                     }
-                    serverFacade.joinGame(null, gameID);
+                    Collection<GameData> games = serverFacade.listGames();
+                    GameData target = games.stream().filter(g -> g.gameID() == gameID)
+                                           .findFirst().orElseThrow(() -> new RuntimeException("Game not found"));
+                    BoardDrawing.drawBoard(target.game(), ChessGame.TeamColor.WHITE);
                     out.println("Observing game " + index);
                 } catch (Exception e) {
-                    out.println("Invalid input.");
+                    out.println("Could not observe game. Please try again.");
                     printObserve();
                 }
             }

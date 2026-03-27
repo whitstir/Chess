@@ -5,11 +5,8 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 import ui.EscapeSequences;
 
-import java.util.concurrent.ScheduledExecutorService;
-
-
 public class BoardDrawing {
-    public void drawBoard(ChessGame game, ChessGame.TeamColor side) {
+    public static void drawBoard(ChessGame game, ChessGame.TeamColor side) {
         if (side == ChessGame.TeamColor.WHITE) {
             drawWhiteBoard(game);
         } else {
@@ -17,7 +14,7 @@ public class BoardDrawing {
         }
     }
 
-    private  void drawWhiteBoard(ChessGame game) {
+    private static void drawWhiteBoard(ChessGame game) {
         printColumnsWhite();
         for (int row = 8; row > 0; row--) {
             System.out.print(row + " ");
@@ -29,25 +26,25 @@ public class BoardDrawing {
         printColumnsWhite();
     }
 
-    private void makeSquare(ChessGame game, int row, int col) {
+    private static void makeSquare(ChessGame game, int row, int col) {
         ChessPosition position = new ChessPosition(row, col);
         ChessPiece chessPiece = game.getBoard().getPiece(position);
         colorSquare(row, col);
         if (chessPiece == null) {
-            System.out.println(EscapeSequences.EMPTY);
+            System.out.print(EscapeSequences.EMPTY);
         } else {
-            System.out.println(getPiece(chessPiece));
+            System.out.print(getPiece(chessPiece));
         }
     }
 
-    private String getPiece(ChessPiece chessPiece) {
+    private static String getPiece(ChessPiece chessPiece) {
         return switch (chessPiece.getTeamColor()) {
             case WHITE -> getWhitePiece(chessPiece);
             case BLACK -> getBlackPiece(chessPiece);
         };
     }
 
-    private String getBlackPiece(ChessPiece chessPiece) {
+    private static String getBlackPiece(ChessPiece chessPiece) {
         return switch (chessPiece.getPieceType()) {
             case KING -> EscapeSequences.BLACK_KING;
             case QUEEN -> EscapeSequences.BLACK_QUEEN;
@@ -58,7 +55,7 @@ public class BoardDrawing {
         };
     }
 
-    private String getWhitePiece(ChessPiece chessPiece) {
+    private static String getWhitePiece(ChessPiece chessPiece) {
         return switch (chessPiece.getPieceType()) {
             case KING -> EscapeSequences.WHITE_KING;
             case QUEEN -> EscapeSequences.WHITE_QUEEN;
@@ -69,16 +66,16 @@ public class BoardDrawing {
         };
     }
 
-    private void colorSquare(int row, int col) {
+    private static void colorSquare(int row, int col) {
         boolean lightSquare = ((row + col) % 2 == 0);
         if (lightSquare) {
-            System.out.println(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
         } else {
-            System.out.println(EscapeSequences.SET_BG_COLOR_DARK_GREY);
+            System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY);
         }
     }
 
-    private void drawBlackBoard(ChessGame game) {
+    private static void drawBlackBoard(ChessGame game) {
         printColumnsBlack();
         for (int row = 1; row <= 8; row++) {
             System.out.print(row + " ");
@@ -90,7 +87,7 @@ public class BoardDrawing {
         printColumnsBlack();
     }
 
-    private void printColumnsWhite() {
+    private static void printColumnsWhite() {
         System.out.print("   ");
         for (char c = 'a'; c < 'i'; c++) {
             System.out.print(" " + c + " ");
@@ -98,7 +95,7 @@ public class BoardDrawing {
         System.out.println();
     }
 
-    private void printColumnsBlack() {
+    private static void printColumnsBlack() {
         System.out.print("   ");
         for (char c = 'h'; c >= 'a'; c--) {
             System.out.print(" " + c + " ");

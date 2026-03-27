@@ -1,8 +1,7 @@
 package client;
 
-
+import chess.ChessGame;
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 
@@ -10,9 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
 
@@ -109,5 +108,4 @@ public class ServerFacade {
             return new String(response.readAllBytes());
         }
     }
-
 }
