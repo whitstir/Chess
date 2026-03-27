@@ -79,6 +79,11 @@ public class ServerFacade {
         return response.games;
     }
 
+    public void joinGame(String playerColor, int gameID) throws URISyntaxException, IOException {
+        var body = Map.of("playerColor", playerColor, "gameID", gameID);
+        request("PUT", "/game", gson.toJson(body));
+    }
+
     private String request(String method, String endpoint, String body) throws URISyntaxException, IOException {
         URI uri = new URI(serverUrl + endpoint);
         HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
