@@ -4,6 +4,7 @@ package client;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import model.AuthData;
+import model.GameData;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +20,7 @@ public class ServerFacade {
     private String authToken;
     private final Gson gson = new Gson();
 
-    public record RegisterRequest(String username, String password, String email) {};
+    public record CreateGame(int gameID) {};
 
     public ServerFacade(int port) {
         this.serverUrl = "http://localhost:" + port;
@@ -58,6 +59,15 @@ public class ServerFacade {
     public void logout() throws URISyntaxException, IOException {
         request("DELETE", "/session", null);
         this.authToken = null;
+    }
+
+
+    public int createGame(String gameName) throws URISyntaxException, IOException {
+        var body = Map.of("gameName", gameName);
+        String response = request("POST", "/game", gson.toJson(body));
+        CreateGame game = gson.fromJson(response, CreateGame.class);
+
+        return game.gameID;
     }
 
     private String request(String method, String endpoint, String body) throws URISyntaxException, IOException {
