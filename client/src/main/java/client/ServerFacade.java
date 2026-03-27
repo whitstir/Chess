@@ -13,6 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.Map;
 
 public class ServerFacade {
@@ -21,6 +22,7 @@ public class ServerFacade {
     private final Gson gson = new Gson();
 
     public record CreateGame(int gameID) {};
+    public record ListGames(Collection<GameData> games) {}
 
     public ServerFacade(int port) {
         this.serverUrl = "http://localhost:" + port;
@@ -68,6 +70,13 @@ public class ServerFacade {
         CreateGame game = gson.fromJson(response, CreateGame.class);
 
         return game.gameID;
+    }
+
+    public Collection<GameData> listGames() throws URISyntaxException, IOException {
+        var body = request("GET", "/game", null);
+        ListGames response = gson.fromJson(body, ListGames.class);
+
+        return response.games;
     }
 
     private String request(String method, String endpoint, String body) throws URISyntaxException, IOException {
