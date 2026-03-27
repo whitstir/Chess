@@ -17,13 +17,27 @@ public class BoardDrawing {
     private static void drawWhiteBoard(ChessGame game) {
         printColumnsWhite();
         for (int row = 8; row > 0; row--) {
-            System.out.print(row + " ");
+            printBorderSquare(" " + row + " ");
             for (int col = 1; col <= 8; col++) {
                 makeSquare(game, row, col);
             }
-            System.out.println(row + " ");
+            printBorderSquare(" " + row + " ");
+            System.out.println();
         }
         printColumnsWhite();
+    }
+
+    private static void drawBlackBoard(ChessGame game) {
+        printColumnsBlack();
+        for (int row = 1; row <= 8; row++) {
+            printBorderSquare(" " + row + " ");
+            for (int col = 8; col > 0; col--) {
+                makeSquare(game, row, col);
+            }
+            printBorderSquare(" " + row + " ");
+            System.out.println();
+        }
+        printColumnsBlack();
     }
 
     private static void makeSquare(ChessGame game, int row, int col) {
@@ -35,6 +49,8 @@ public class BoardDrawing {
         } else {
             System.out.print(getPiece(chessPiece));
         }
+        System.out.print(EscapeSequences.RESET_BG_COLOR);
+        System.out.print(EscapeSequences.RESET_TEXT_COLOR);
     }
 
     private static String getPiece(ChessPiece chessPiece) {
@@ -46,23 +62,23 @@ public class BoardDrawing {
 
     private static String getBlackPiece(ChessPiece chessPiece) {
         return switch (chessPiece.getPieceType()) {
-            case KING -> EscapeSequences.BLACK_KING;
-            case QUEEN -> EscapeSequences.BLACK_QUEEN;
-            case BISHOP -> EscapeSequences.BLACK_BISHOP;
-            case KNIGHT -> EscapeSequences.BLACK_KNIGHT;
-            case ROOK -> EscapeSequences.BLACK_ROOK;
-            case PAWN -> EscapeSequences.BLACK_PAWN;
+            case KING -> EscapeSequences.SET_TEXT_COLOR_BLUE + EscapeSequences.BLACK_KING;
+            case QUEEN -> EscapeSequences.SET_TEXT_COLOR_BLUE + EscapeSequences.BLACK_QUEEN;
+            case BISHOP -> EscapeSequences.SET_TEXT_COLOR_BLUE + EscapeSequences.BLACK_BISHOP;
+            case KNIGHT -> EscapeSequences.SET_TEXT_COLOR_BLUE + EscapeSequences.BLACK_KNIGHT;
+            case ROOK -> EscapeSequences.SET_TEXT_COLOR_BLUE + EscapeSequences.BLACK_ROOK;
+            case PAWN -> EscapeSequences.SET_TEXT_COLOR_BLUE + EscapeSequences.BLACK_PAWN;
         };
     }
 
     private static String getWhitePiece(ChessPiece chessPiece) {
         return switch (chessPiece.getPieceType()) {
-            case KING -> EscapeSequences.WHITE_KING;
-            case QUEEN -> EscapeSequences.WHITE_QUEEN;
-            case BISHOP -> EscapeSequences.WHITE_BISHOP;
-            case KNIGHT -> EscapeSequences.WHITE_KNIGHT;
-            case ROOK -> EscapeSequences.WHITE_ROOK;
-            case PAWN -> EscapeSequences.WHITE_PAWN;
+            case KING -> EscapeSequences.SET_TEXT_COLOR_RED + EscapeSequences.WHITE_KING;
+            case QUEEN -> EscapeSequences.SET_TEXT_COLOR_RED + EscapeSequences.WHITE_QUEEN;
+            case BISHOP -> EscapeSequences.SET_TEXT_COLOR_RED + EscapeSequences.WHITE_BISHOP;
+            case KNIGHT -> EscapeSequences.SET_TEXT_COLOR_RED + EscapeSequences.WHITE_KNIGHT;
+            case ROOK -> EscapeSequences.SET_TEXT_COLOR_RED + EscapeSequences.WHITE_ROOK;
+            case PAWN -> EscapeSequences.SET_TEXT_COLOR_RED + EscapeSequences.WHITE_PAWN;
         };
     }
 
@@ -75,31 +91,29 @@ public class BoardDrawing {
         }
     }
 
-    private static void drawBlackBoard(ChessGame game) {
-        printColumnsBlack();
-        for (int row = 1; row <= 8; row++) {
-            System.out.print(row + " ");
-            for (int col = 8; col > 0; col--) {
-                makeSquare(game, row, col);
-            }
-            System.out.println(row + " ");
-        }
-        printColumnsBlack();
+    private static void printBorderSquare(String text) {
+        System.out.print(EscapeSequences.SET_BG_COLOR_BLACK);
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE);
+        System.out.print(text);
+        System.out.print(EscapeSequences.RESET_BG_COLOR);
+        System.out.print(EscapeSequences.RESET_TEXT_COLOR);
     }
 
     private static void printColumnsWhite() {
-        System.out.print("   ");
-        for (char c = 'a'; c < 'i'; c++) {
-            System.out.print(" " + c + " ");
+        printBorderSquare("   ");
+        for (char c = 'a'; c <= 'h'; c++) {
+            printBorderSquare(" " + c + " ");
         }
+        printBorderSquare("   ");
         System.out.println();
     }
 
     private static void printColumnsBlack() {
-        System.out.print("   ");
+        printBorderSquare("   ");
         for (char c = 'h'; c >= 'a'; c--) {
-            System.out.print(" " + c + " ");
+            printBorderSquare(" " + c + " ");
         }
+        printBorderSquare("   ");
         System.out.println();
     }
 }
