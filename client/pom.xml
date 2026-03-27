@@ -14,14 +14,14 @@
     <packaging>jar</packaging>
 
     <build>
-        <finalName>client</finalName>
+        <finalName>repl</finalName>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.1</version>
                 <configuration>
-                    <mainClass>client.ClientMain</mainClass>
+                    <mainClass>repl.ClientMain</mainClass>
                 </configuration>
             </plugin>
             <plugin>
@@ -38,7 +38,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        client.ClientMain
+                                        repl.ClientMain
                                     </mainClass>
                                 </manifest>
                             </archive>

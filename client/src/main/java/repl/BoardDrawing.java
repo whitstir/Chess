@@ -1,4 +1,4 @@
-package client;
+package repl;
 
 import chess.ChessGame;
 import chess.ChessPiece;

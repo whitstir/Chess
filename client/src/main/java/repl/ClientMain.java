@@ -1,6 +1,4 @@
-package client;
-
-import chess.*;
+package repl;
 
 public class ClientMain {
     public static void main(String[] args) {

@@ -1,8 +1,7 @@
-package client;
+package repl;
 
 import chess.ChessGame;
 import model.GameData;
-import client.BoardDrawing;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
