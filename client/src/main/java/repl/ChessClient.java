@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 
-import static java.lang.String.valueOf;
 import static java.lang.System.out;
 
 public class ChessClient {
@@ -39,7 +38,6 @@ public class ChessClient {
                 printLogin();
                 printHelp();
                 printQuit();
-                break;
             }
             case "quit" -> {
                 System.exit(0);
@@ -137,13 +135,7 @@ public class ChessClient {
                     printLogout();
                     break;
                 }
-                try {
-                    serverFacade.logout();
-                    loggedIn = false;
-                    out.println("Logged out successfully.");
-                } catch (Exception e) {
-                    out.println("Logout failure");
-                }
+                logoutUser();
             }
             case "quit" -> {
                 System.exit(0);
@@ -156,7 +148,6 @@ public class ChessClient {
                 printLogout();
                 printQuit();
                 printHelp();
-                break;
             }
             default -> out.println("Unknown command. Type help.");
 
@@ -254,6 +245,16 @@ public class ChessClient {
         } catch (Exception e) {
             out.println("Could not join game. Please try again.");
             printJoin();
+        }
+    }
+
+    private void logoutUser() {
+        try {
+            serverFacade.logout();
+            loggedIn = false;
+            out.println("Logged out successfully.");
+        } catch (Exception e) {
+            out.println("Logout failure");
         }
     }
 }
