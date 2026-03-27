@@ -85,9 +85,9 @@ public class BoardDrawing {
     private static void colorSquare(int row, int col) {
         boolean lightSquare = ((row + col) % 2 == 0);
         if (lightSquare) {
-            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-        } else {
             System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY);
+        } else {
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
         }
     }
 

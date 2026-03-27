@@ -98,7 +98,7 @@ public class ChessClient {
                     gameMap.clear();
                     int index = 1;
                     for (GameData game : games) {
-                        gameMap.put(index, game.gameID());
+                        gameMap.put(index, index);
                         String white = game.whiteUsername() == null ? "-" : game.whiteUsername();
                         String black = game.blackUsername() == null ? "-" : game.blackUsername();
                         out.println(index + ": " + game.gameName() + " (" + white + " vs " + black + ")");
@@ -121,23 +121,7 @@ public class ChessClient {
                     out.println("Color must be WHITE or BLACK");
                     return;
                 }
-                try {
-                    int index = Integer.parseInt(input[1]);
-                    Integer gameID = gameMap.get(index);
-                    if (gameID == null) {
-                        out.println("Invalid game number. Run 'list' first.");
-                        return;
-                    }
-                    serverFacade.joinGame(input[2], gameID);
-                    Collection<GameData> games = serverFacade.listGames();
-                    GameData target = games.stream().filter(g -> g.gameID() == gameID)
-                                           .findFirst().orElseThrow(() -> new RuntimeException("Game not found"));
-                    BoardDrawing.drawBoard(target.game(), ChessGame.TeamColor.valueOf(input[2].toUpperCase()));
-                    out.println("Successfully joined game " + index);
-                } catch (Exception e) {
-                    out.println("Could not join game. Please try again.");
-                    printJoin();
-                }
+                joinGame(input);
             }
             case "observe" -> {
                 if (input.length != 2) {
@@ -145,22 +129,7 @@ public class ChessClient {
                     printObserve();
                     break;
                 }
-                try {
-                    int index = Integer.parseInt(input[1]);
-                    Integer gameID = gameMap.get(index);
-                    if (gameID == null) {
-                        out.println("Invalid game number. Run 'list' first.");
-                        return;
-                    }
-                    Collection<GameData> games = serverFacade.listGames();
-                    GameData target = games.stream().filter(g -> g.gameID() == gameID)
-                                           .findFirst().orElseThrow(() -> new RuntimeException("Game not found"));
-                    BoardDrawing.drawBoard(target.game(), ChessGame.TeamColor.WHITE);
-                    out.println("Observing game " + index);
-                } catch (Exception e) {
-                    out.println("Could not observe game. Please try again.");
-                    printObserve();
-                }
+                observeUser(input);
             }
             case "logout" -> {
                 if (input.length != 1) {
@@ -246,6 +215,45 @@ public class ChessClient {
             out.println("Successfully logged in.");
         } catch (Exception e) {
             out.println("Incorrect username or password.");
+        }
+    }
+
+    private void observeUser(String[] input) {
+        try {
+            int index = Integer.parseInt(input[1]);
+            Integer gameID = gameMap.get(index);
+            if (gameID == null) {
+                out.println("Invalid game number. Run 'list' first.");
+                return;
+            }
+            Collection<GameData> games = serverFacade.listGames();
+            GameData target = games.stream().filter(g -> g.gameID() == gameID)
+                    .findFirst().orElseThrow(() -> new RuntimeException("Game not found"));
+            BoardDrawing.drawBoard(target.game(), ChessGame.TeamColor.WHITE);
+            out.println("Observing game " + index);
+        } catch (Exception e) {
+            out.println("Could not observe game. Please try again.");
+            printObserve();
+        }
+    }
+
+    private void joinGame(String[] input) {
+        try {
+            int index = Integer.parseInt(input[1]);
+            Integer gameID = gameMap.get(index);
+            if (gameID == null) {
+                out.println("Invalid game number. Run 'list' first.");
+                return;
+            }
+            serverFacade.joinGame(input[2], gameID);
+            Collection<GameData> games = serverFacade.listGames();
+            GameData target = games.stream().filter(g -> g.gameID() == gameID)
+                    .findFirst().orElseThrow(() -> new RuntimeException("Game not found"));
+            BoardDrawing.drawBoard(target.game(), ChessGame.TeamColor.valueOf(input[2].toUpperCase()));
+            out.println("Successfully joined game " + index);
+        } catch (Exception e) {
+            out.println("Could not join game. Please try again.");
+            printJoin();
         }
     }
 }
