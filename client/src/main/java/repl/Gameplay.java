@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 import static java.lang.System.out;
 
-public class GameplayClient implements ServerMessageObserver {
+public class Gameplay implements ServerMessageObserver {
     private final Scanner scanner = new Scanner(System.in);
     private final WebSocketCommunicator webSocketCommunicator;
     private final String authToken;
@@ -15,8 +15,8 @@ public class GameplayClient implements ServerMessageObserver {
     private ChessGame currentGame;
     boolean enteredGame = false;
 
-    public GameplayClient(WebSocketCommunicator webSocketCommunicator, String authToken, int gameID,
-                          ChessGame.TeamColor playerColor) {
+    public Gameplay(WebSocketCommunicator webSocketCommunicator, String authToken, int gameID,
+                    ChessGame.TeamColor playerColor) {
         this.webSocketCommunicator = webSocketCommunicator;
         this.authToken = authToken;
         this.gameID = gameID;
@@ -51,6 +51,25 @@ public class GameplayClient implements ServerMessageObserver {
             }
         }
     }
+
+    private void redrawBoard() {
+        if (currentGame != null) {
+            out.println("No game found");
+            return;
+        }
+        ChessGame.TeamColor drawFrom;
+        if (playerColor != null) {
+            drawFrom = playerColor;
+        } else {
+            drawFrom = ChessGame.TeamColor.WHITE;
+        }
+        BoardDrawing.drawBoard(currentGame, drawFrom);
+    }
+
+    private void printHelp() {
+        out.println("help - with possible commands");
+    }
+
     private String[] getInput() {
         if (enteredGame) {
             out.print("\n[LOGGED IN] >>> ");
