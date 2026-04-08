@@ -1,9 +1,12 @@
 package repl;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import ui.EscapeSequences;
+
+import java.util.Collection;
 
 public class BoardDrawing {
     public static void drawBoard(ChessGame game, ChessGame.TeamColor side) {
@@ -115,5 +118,9 @@ public class BoardDrawing {
         }
         printBorderSquare("   ");
         System.out.println();
+    }
+
+    public static void drawHighlights(ChessGame currentGame, ChessGame.TeamColor drawFrom, ChessPosition position,
+                                      Collection<ChessMove> possibleMoves) {
     }
 }

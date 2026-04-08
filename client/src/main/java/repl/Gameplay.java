@@ -11,6 +11,7 @@ import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -40,6 +41,10 @@ public class Gameplay implements ServerMessageObserver {
             switch (input[0].toLowerCase()) {
                 case "help" -> {
                     printHelp();
+                    printRedraw();
+                    printLeave();
+                    printMove();
+                    printResign();
                 }
                 case "redraw" -> {
                     redrawBoard();
@@ -55,7 +60,7 @@ public class Gameplay implements ServerMessageObserver {
                     resignGame();
                 }
                 case "highlight" -> {
-                    highlightMoves();
+                    highlightMoves(input);
                 }
                 default -> out.println("Unknown command. Type help.");
             }
@@ -86,16 +91,27 @@ public class Gameplay implements ServerMessageObserver {
         }
     }
 
-    @Override
-    public void onMessage(ServerMessage message) {
-        out.println();
-        if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-            currentGame = ((LoadGameMessage) message).getGame().game();
-            redrawBoard();
-        } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
-            out.println("[ERROR] " + ((ErrorMessage) message).getErrorMessage());
-        } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
-            out.println(((NotificationMessage) message).getNotificationMessage());
+    private void highlightMoves(String[] input) {
+        if (input.length < 2) {
+            printHighlights();
+            return;
+        }
+        if (currentGame == null) {
+            out.println("No game loaded.");
+            return;
+        }
+        try {
+            ChessGame.TeamColor drawFrom;
+            ChessPosition position = getPosition(input[1]);
+            Collection<ChessMove> possibleMoves = currentGame.validMoves(position);
+            if (playerColor != null) {
+                drawFrom = playerColor;
+            } else {
+                drawFrom = ChessGame.TeamColor.WHITE;
+            }
+            BoardDrawing.drawHighlights(currentGame, drawFrom, position, possibleMoves);
+        } catch (Exception e) {
+            out.println("Invalid square selected.");
         }
     }
 
@@ -105,8 +121,7 @@ public class Gameplay implements ServerMessageObserver {
             return;
         }
         if (input.length < 3) {
-            out.println("For a normal move, please input 'move' <from> <to>");
-            out.println("For a promotion move, please input 'move' <from> <to> <promotion piece>");
+            printMove();
         }
         try {
             ChessPosition fromPosition = getPosition(input[1]);
@@ -180,8 +195,24 @@ public class Gameplay implements ServerMessageObserver {
         BoardDrawing.drawBoard(currentGame, drawFrom);
     }
 
-    private void printHelp() {
-        out.println("help - with possible commands");
+    private void printHelp() { out.println("help - with possible commands"); }
+
+    private void printRedraw() {
+        out.println("redraw - redraws the chess board");
+    }
+
+    private void printLeave() {
+        out.println("leave - exit the game");
+    }
+
+    private void printMove() { out.println("move <from> <to> <promotionpiece (optional)> - make a move"); }
+
+    private void printResign() {
+        out.println("resign - forfeit the game");
+    }
+
+    private void printHighlights() {
+        out.println("highlight <square> - shows all legal moves of the selected piece");
     }
 
     private String[] getInput() {
@@ -193,5 +224,17 @@ public class Gameplay implements ServerMessageObserver {
         return scanner.nextLine().split(" ");
     }
 
+    @Override
+    public void onMessage(ServerMessage message) {
+        out.println();
+        if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+            currentGame = ((LoadGameMessage) message).getGame().game();
+            redrawBoard();
+        } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+            out.println("[ERROR] " + ((ErrorMessage) message).getErrorMessage());
+        } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+            out.println(((NotificationMessage) message).getNotificationMessage());
+        }
+    }
 
 }
