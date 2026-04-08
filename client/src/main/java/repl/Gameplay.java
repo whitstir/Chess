@@ -5,6 +5,7 @@ import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import websocket.commands.MakeMoveCommand;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -58,6 +59,30 @@ public class Gameplay implements ServerMessageObserver {
                 }
                 default -> out.println("Unknown command. Type help.");
             }
+        }
+    }
+
+    private void resignGame() {
+        out.print("Are you sure you want to resign? ");
+        String answer = scanner.nextLine().toLowerCase();
+        if (answer.equals("yes")) {
+            try {
+                webSocketCommunicator.send(new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID));
+            } catch (Exception e) {
+                out.println("Could not resign.");
+            }
+        } else {
+            out.println("Resign cancelled.");
+        }
+
+    }
+
+    private void leaveGame() {
+        try {
+            webSocketCommunicator.send(new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID));
+            webSocketCommunicator.close();
+        } catch (Exception e) {
+            out.println("Couldn't leave the game.");
         }
     }
 
