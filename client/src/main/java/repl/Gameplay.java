@@ -1,8 +1,10 @@
 package repl;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
+import websocket.commands.MakeMoveCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -68,9 +70,8 @@ public class Gameplay implements ServerMessageObserver {
         } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
             out.println("[ERROR] " + ((ErrorMessage) message).getErrorMessage());
         } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
-            out.println(((NotificationMessage) message).getMessage());
+            out.println(((NotificationMessage) message).getNotificationMessage());
         }
-        printPrompt();
     }
 
     private void makeMove(String[] input) {
@@ -85,6 +86,13 @@ public class Gameplay implements ServerMessageObserver {
         try {
             ChessPosition fromPosition = getPosition(input[1]);
             ChessPosition toPosition = getPosition(input[2]);
+            ChessPiece.PieceType promotion = null;
+
+            if (input.length >= 4) {
+                promotion = getPromotion(input[3]);
+            }
+            ChessMove move = new ChessMove(fromPosition, toPosition, promotion);
+            webSocketCommunicator.send(new MakeMoveCommand(authToken, gameID, move));
         } catch (Exception e) {
             out.println("Invalid move");
         }
@@ -94,10 +102,12 @@ public class Gameplay implements ServerMessageObserver {
         if (s.length() != 2) {
             out.println("Invalid chess position");
         }
+
         char columnLetter = s.charAt(0);
         char rowNumber = s.charAt(1);
         int col;
         int row;
+
         col = switch (columnLetter) {
             case 'a' -> 1;
             case 'b' -> 2;
@@ -124,11 +134,22 @@ public class Gameplay implements ServerMessageObserver {
         return new ChessPosition(row, col);
     }
 
+    private ChessPiece.PieceType getPromotion(String s) {
+        return switch (s.toLowerCase()) {
+            case "queen" -> ChessPiece.PieceType.QUEEN;
+            case "rook" -> ChessPiece.PieceType.ROOK;
+            case "bishop" -> ChessPiece.PieceType.BISHOP;
+            case "knight" -> ChessPiece.PieceType.KNIGHT;
+            default -> throw new IllegalArgumentException("Invalid promotion piece");
+        };
+    }
+
     private void redrawBoard() {
         if (currentGame == null) {
             out.println("No game found");
             return;
         }
+
         ChessGame.TeamColor drawFrom;
         drawFrom = Objects.requireNonNullElse(playerColor, ChessGame.TeamColor.WHITE);
         BoardDrawing.drawBoard(currentGame, drawFrom);
