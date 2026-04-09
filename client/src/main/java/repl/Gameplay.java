@@ -233,6 +233,7 @@ public class Gameplay implements ServerMessageObserver {
     @Override
     public void onMessage(ServerMessage message) {
         out.println();
+        out.println("MESSAGE RECEIVED");
         String side;
         if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
             LoadGameMessage lgm = (LoadGameMessage) message;
