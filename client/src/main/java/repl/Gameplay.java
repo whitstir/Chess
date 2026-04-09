@@ -194,7 +194,6 @@ public class Gameplay implements ServerMessageObserver {
             out.println("No game found");
             return;
         }
-
         ChessGame.TeamColor drawFrom;
         drawFrom = Objects.requireNonNullElse(playerColor, ChessGame.TeamColor.WHITE);
         BoardDrawing.drawBoard(currentGame, drawFrom);
