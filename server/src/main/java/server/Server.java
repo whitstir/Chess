@@ -35,7 +35,13 @@ public class Server {
     private final GameService gameService = new GameService(dao);
 
     public Server() {
+        WebSocketHandler wsHandler = new WebSocketHandler(dao);
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
+                .ws("/ws", ws -> {
+                    ws.onConnect(wsHandler::handleConnect);
+                    ws.onMessage(wsHandler::handleMessage);
+                    ws.onClose(wsHandler::handleClose);
+                })
                 .delete("/db", this::clear)
                 .post("/user", this::register)
                 .post("/session", this::login)

@@ -3,6 +3,7 @@ package repl;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
+import websocket.commands.UserGameCommand;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -105,5 +106,11 @@ public class ServerFacade {
         try (InputStream response = connection.getInputStream()) {
             return new String(response.readAllBytes());
         }
+    }
+
+    public WebSocketCommunicator connect(int gameId, ServerMessageObserver observer) throws Exception {
+        WebSocketCommunicator webSocketCommunicator = new WebSocketCommunicator(serverUrl, observer);
+        webSocketCommunicator.send(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameId));
+        return webSocketCommunicator;
     }
 }

@@ -236,11 +236,13 @@ public class ChessClient {
                 out.println("Invalid game number. Run 'list' first.");
                 return;
             }
+            ChessGame.TeamColor color = ChessGame.TeamColor.valueOf(input[2].toUpperCase());
             serverFacade.joinGame(input[2], gameID);
-            Collection<GameData> games = serverFacade.listGames();
-            GameData target = games.stream().filter(g -> g.gameID() == gameID)
-                    .findFirst().orElseThrow(() -> new RuntimeException("Game not found"));
-            BoardDrawing.drawBoard(target.game(), ChessGame.TeamColor.valueOf(input[2].toUpperCase()));
+            Gameplay gameplay = new Gameplay(null, serverFacade.getAuthToken(),
+                    gameID, color);
+            WebSocketCommunicator webSocketCommunicator = serverFacade.connect(gameID, gameplay);
+            gameplay.setWebSocketCommunicator(webSocketCommunicator); // see note below
+            gameplay.run();
             out.println("Successfully joined game " + index);
         } catch (Exception e) {
             out.println("Could not join game. Please try again.");

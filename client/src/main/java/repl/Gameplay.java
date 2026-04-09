@@ -19,7 +19,7 @@ import static java.lang.System.out;
 
 public class Gameplay implements ServerMessageObserver {
     private final Scanner scanner = new Scanner(System.in);
-    private final WebSocketCommunicator webSocketCommunicator;
+    private WebSocketCommunicator webSocketCommunicator;
     private final String authToken;
     private final int gameID;
     private final ChessGame.TeamColor playerColor;
@@ -32,6 +32,10 @@ public class Gameplay implements ServerMessageObserver {
         this.authToken = authToken;
         this.gameID = gameID;
         this.playerColor = playerColor;
+    }
+
+    public void setWebSocketCommunicator(WebSocketCommunicator webSocketCommunicator) {
+        this.webSocketCommunicator = webSocketCommunicator;
     }
 
     public void run() {

@@ -120,7 +120,9 @@ public class BoardDrawing {
         System.out.println();
     }
 
-    public static void drawHighlights(ChessGame currentGame, ChessGame.TeamColor drawFrom, ChessPosition position,
+
+    // DON'T FORGET ABOUT THIS FUNCTION WHIT HAHAHA :)))
+    public static void drawHighlights(ChessGame game, ChessGame.TeamColor drawFrom, ChessPosition position,
                                       Collection<ChessMove> possibleMoves) {
     }
 }
