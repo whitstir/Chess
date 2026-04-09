@@ -113,7 +113,6 @@ public class ServerFacade {
     public WebSocketCommunicator connect(int gameId, ServerMessageObserver observer) throws Exception {
         WebSocketCommunicator webSocketCommunicator = new WebSocketCommunicator(serverUrl, observer);
         UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameId);
-        out.println("[DEBUG] Sending CONNECT command: " + new Gson().toJson(command));
         webSocketCommunicator.send(command);
         return webSocketCommunicator;
     }

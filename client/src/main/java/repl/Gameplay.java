@@ -232,13 +232,10 @@ public class Gameplay implements ServerMessageObserver {
 
     @Override
     public void onMessage(ServerMessage message) {
-        System.out.println("[DEBUG] onMessage called, type: " + message.getServerMessageType());
         out.println();
         String side;
         if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
             LoadGameMessage lgm = (LoadGameMessage) message;
-            System.out.println("[DEBUG CLIENT] game object: " + lgm.getGame());
-            System.out.println("[DEBUG CLIENT] chess game: " + lgm.getGame().game());
             currentGame = lgm.getGame().game();
             redrawBoard();
         } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {

@@ -26,7 +26,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleConnect(WsConnectContext ctx) {
-        System.out.println("[DEBUG SERVER] WsConnectContext fired - connection opened");
         out.println("WebSocket connected");
         ctx.enableAutomaticPings();
     }
@@ -39,7 +38,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleMessage(WsMessageContext ctx) {
-        System.out.println("[DEBUG SERVER] handleMessage raw: " + ctx.message());
         try {
             UserGameCommand action = gson.fromJson(ctx.message(), UserGameCommand.class);
             var auth = dao.getAuth(action.getAuthToken());
@@ -66,10 +64,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void handleConnect(WsContext ctx, UserGameCommand userGameCommand, String username)
             throws DataAccessException {
-        System.out.println("[DEBUG SERVER] handleConnect called for user: " + username + " gameID: " + userGameCommand.getGameID());
         int gameID = userGameCommand.getGameID();
         GameData game = dao.getGame(gameID);
-        System.out.println("[DEBUG SERVER] game found: " + (game != null));
         String role;
         if (game == null) {
             sendError(ctx, GAME_NOT_FOUND_ERROR);

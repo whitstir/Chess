@@ -41,7 +41,6 @@ public class Server {
                     ws.onConnect(wsHandler::handleConnect);
                     ws.onMessage(ctx -> wsHandler.handleMessage(ctx));
                     ws.onClose(wsHandler::handleClose);
-                    ws.onError(ctx -> System.out.println("[DEBUG SERVER] WS error: " + ctx.error()));
                 })
                 .delete("/db", this::clear)
                 .post("/user", this::register)
