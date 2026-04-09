@@ -34,7 +34,7 @@ public class WebSocketCommunicator extends Endpoint {
                     observer.onMessage(typed);
                 }
             } catch (Exception e) {
-                System.err.println("Error processing WebSocket message: " + e.getMessage());
+                System.err.println("Error: " + e.getMessage());
                 e.printStackTrace(System.err);
             }
         });

@@ -39,7 +39,7 @@ public class Server {
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
                 .ws("/ws", ws -> {
                     ws.onConnect(wsHandler::handleConnect);
-                    ws.onMessage(ctx -> wsHandler.handleMessage(ctx));
+                    ws.onMessage(wsHandler::handleMessage);
                     ws.onClose(wsHandler::handleClose);
                 })
                 .delete("/db", this::clear)

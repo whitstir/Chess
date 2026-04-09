@@ -209,7 +209,7 @@ public class Gameplay implements ServerMessageObserver {
         out.println("leave - exit the game");
     }
 
-    private void printMove() { out.println("move <from> <to> <promotionpiece (optional)> - make a move"); }
+    private void printMove() { out.println("move <from> <to> <promotion piece (optional)> - make a move"); }
 
     private void printResign() {
         out.println("resign - forfeit the game");
