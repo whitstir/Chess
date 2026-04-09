@@ -54,4 +54,6 @@ public class WebSocketCommunicator extends Endpoint {
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
+
+
 }

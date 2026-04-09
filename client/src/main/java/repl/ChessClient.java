@@ -14,7 +14,7 @@ public class ChessClient {
     private final ServerFacade serverFacade;
     private boolean loggedIn = false;
     private final Map<Integer, Integer> gameMap = new HashMap<>();
-    private WebSocketCommunicator webSocketCommunicator;
+    private WebSocketFacade webSocketFacade;
 
 
     public ChessClient(ServerFacade serverFacade) {
@@ -220,8 +220,8 @@ public class ChessClient {
             }
             Gameplay gameplay = new Gameplay(null, serverFacade.getAuthToken(),
                     gameID, null);
-            webSocketCommunicator = serverFacade.connect(gameID, gameplay);
-            gameplay.setWebSocketCommunicator(webSocketCommunicator);
+            webSocketFacade = serverFacade.connect(gameID, gameplay);
+            gameplay.setWebSocketFacade(webSocketFacade);
             gameplay.run();
         } catch (Exception e) {
             out.println("Could not observe game. Please try again.");
@@ -241,8 +241,8 @@ public class ChessClient {
             serverFacade.joinGame(input[2], gameID);
             Gameplay gameplay = new Gameplay(null, serverFacade.getAuthToken(),
                     gameID, color);
-            webSocketCommunicator = serverFacade.connect(gameID, gameplay);
-            gameplay.setWebSocketCommunicator(webSocketCommunicator);
+            webSocketFacade = serverFacade.connect(gameID, gameplay);
+            gameplay.setWebSocketFacade(webSocketFacade);
             gameplay.run();
         } catch (Exception e) {
             out.println("Could not join game. Please try again.");

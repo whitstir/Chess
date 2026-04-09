@@ -81,6 +81,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             role = "observer";
         }
         connections.broadcast(gameID, ctx, gson.toJson(new NotificationMessage(username + " joined as " + role)));
+
     }
 
     private void handleMakeMove(WsContext ctx, MakeMoveCommand makeMoveCommand, String username)

@@ -19,26 +19,27 @@ import static java.lang.System.out;
 
 public class Gameplay implements ServerMessageObserver {
     private final Scanner scanner = new Scanner(System.in);
-    private WebSocketCommunicator webSocketCommunicator;
+    private WebSocketFacade webSocketFacade;
     private final String authToken;
     private final int gameID;
     private final ChessGame.TeamColor playerColor;
     private volatile ChessGame currentGame;
     boolean enteredGame = false;
 
-    public Gameplay(WebSocketCommunicator webSocketCommunicator, String authToken, int gameID,
+    public Gameplay(WebSocketFacade webSocketFacade, String authToken, int gameID,
                     ChessGame.TeamColor playerColor) {
-        this.webSocketCommunicator = webSocketCommunicator;
+        this.webSocketFacade = webSocketFacade;
         this.authToken = authToken;
         this.gameID = gameID;
         this.playerColor = playerColor;
     }
 
-    public void setWebSocketCommunicator(WebSocketCommunicator webSocketCommunicator) {
-        this.webSocketCommunicator = webSocketCommunicator;
+    public void setWebSocketFacade(WebSocketFacade webSocketFacade) {
+        this.webSocketFacade = webSocketFacade;
     }
 
     public void run() {
+
         enteredGame = true;
         while (enteredGame) {
             String[] input = getInput();
@@ -76,7 +77,7 @@ public class Gameplay implements ServerMessageObserver {
         String answer = scanner.nextLine().toLowerCase();
         if (answer.equals("yes")) {
             try {
-                webSocketCommunicator.send(new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID));
+                webSocketFacade.resign(authToken, gameID);
             } catch (Exception e) {
                 out.println("Could not resign.");
             }
@@ -88,8 +89,8 @@ public class Gameplay implements ServerMessageObserver {
 
     private void leaveGame() {
         try {
-            webSocketCommunicator.send(new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID));
-            webSocketCommunicator.close();
+            webSocketFacade.leave(authToken, gameID);
+            webSocketFacade.close();
         } catch (Exception e) {
             out.println("Couldn't leave the game." + e.getMessage());
         }
@@ -137,7 +138,7 @@ public class Gameplay implements ServerMessageObserver {
                 promotion = getPromotion(input[3]);
             }
             ChessMove move = new ChessMove(fromPosition, toPosition, promotion);
-            webSocketCommunicator.send(new MakeMoveCommand(authToken, gameID, move));
+            webSocketFacade.makeMove(authToken, gameID, move);
         } catch (Exception e) {
             out.println("Invalid move: " + e.getMessage());
         }
@@ -234,7 +235,6 @@ public class Gameplay implements ServerMessageObserver {
     public void onMessage(ServerMessage message) {
         out.println();
         out.println("MESSAGE RECEIVED");
-        String side;
         if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
             LoadGameMessage lgm = (LoadGameMessage) message;
             currentGame = lgm.getGame().game();
@@ -244,6 +244,7 @@ public class Gameplay implements ServerMessageObserver {
         } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
             out.println(((NotificationMessage) message).getNotificationMessage());
         }
+        String side;
         if (playerColor != null) {
             side = playerColor.toString();
         } else {

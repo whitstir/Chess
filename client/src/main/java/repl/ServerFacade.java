@@ -110,10 +110,9 @@ public class ServerFacade {
         }
     }
 
-    public WebSocketCommunicator connect(int gameId, ServerMessageObserver observer) throws Exception {
-        WebSocketCommunicator webSocketCommunicator = new WebSocketCommunicator(serverUrl, observer);
-        UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameId);
-        webSocketCommunicator.send(command);
-        return webSocketCommunicator;
+    public WebSocketFacade connect(int gameId, ServerMessageObserver observer) throws Exception {
+        WebSocketFacade webSocketFacade = new WebSocketFacade(serverUrl, observer);
+        webSocketFacade.connect(authToken, gameId);
+        return webSocketFacade;
     }
 }
