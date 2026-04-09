@@ -14,6 +14,8 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Map;
 
+import static java.lang.System.out;
+
 public class ServerFacade {
     private final String serverUrl;
     private String authToken;
@@ -110,7 +112,9 @@ public class ServerFacade {
 
     public WebSocketCommunicator connect(int gameId, ServerMessageObserver observer) throws Exception {
         WebSocketCommunicator webSocketCommunicator = new WebSocketCommunicator(serverUrl, observer);
-        webSocketCommunicator.send(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameId));
+        UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameId);
+        out.println("[DEBUG] Sending CONNECT command: " + new Gson().toJson(command));
+        webSocketCommunicator.send(command);
         return webSocketCommunicator;
     }
 }

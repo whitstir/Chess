@@ -14,6 +14,7 @@ public class ChessClient {
     private final ServerFacade serverFacade;
     private boolean loggedIn = false;
     private final Map<Integer, Integer> gameMap = new HashMap<>();
+    private WebSocketCommunicator activeWebSocket;
 
 
     public ChessClient(ServerFacade serverFacade) {
@@ -96,7 +97,7 @@ public class ChessClient {
                     gameMap.clear();
                     int index = 1;
                     for (GameData game : games) {
-                        gameMap.put(index, index);
+                        gameMap.put(index, game.gameID());
                         String white = game.whiteUsername() == null ? "-" : game.whiteUsername();
                         String black = game.blackUsername() == null ? "-" : game.blackUsername();
                         out.println(index + ": " + game.gameName() + " (" + white + " vs " + black + ")");
@@ -217,11 +218,12 @@ public class ChessClient {
                 out.println("Invalid game number. Run 'list' first.");
                 return;
             }
-            Collection<GameData> games = serverFacade.listGames();
-            GameData target = games.stream().filter(g -> g.gameID() == gameID)
-                    .findFirst().orElseThrow(() -> new RuntimeException("Game not found"));
-            BoardDrawing.drawBoard(target.game(), ChessGame.TeamColor.WHITE);
-            out.println("Observing game " + index);
+            Gameplay gameplay = new Gameplay(null, serverFacade.getAuthToken(),
+                    gameID, null);
+            activeWebSocket = serverFacade.connect(gameID, gameplay);
+            gameplay.setWebSocketCommunicator(activeWebSocket);
+            Thread.sleep(100);
+            gameplay.run();
         } catch (Exception e) {
             out.println("Could not observe game. Please try again.");
             printObserve();
@@ -240,10 +242,10 @@ public class ChessClient {
             serverFacade.joinGame(input[2], gameID);
             Gameplay gameplay = new Gameplay(null, serverFacade.getAuthToken(),
                     gameID, color);
-            WebSocketCommunicator webSocketCommunicator = serverFacade.connect(gameID, gameplay);
-            gameplay.setWebSocketCommunicator(webSocketCommunicator); // see note below
+            activeWebSocket = serverFacade.connect(gameID, gameplay);
+            gameplay.setWebSocketCommunicator(activeWebSocket);
+            Thread.sleep(100);
             gameplay.run();
-            out.println("Successfully joined game " + index);
         } catch (Exception e) {
             out.println("Could not join game. Please try again.");
             printJoin();

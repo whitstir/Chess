@@ -36,11 +36,12 @@ public class Server {
 
     public Server() {
         WebSocketHandler wsHandler = new WebSocketHandler(dao);
-        javalin = Javalin.create(config -> config.staticFiles.add("web"))
+        javalin = Javalin.create()
                 .ws("/ws", ws -> {
                     ws.onConnect(wsHandler::handleConnect);
-                    ws.onMessage(wsHandler::handleMessage);
+                    ws.onMessage(ctx -> wsHandler.handleMessage(ctx));
                     ws.onClose(wsHandler::handleClose);
+                    ws.onError(ctx -> System.out.println("[DEBUG SERVER] WS error: " + ctx.error()));
                 })
                 .delete("/db", this::clear)
                 .post("/user", this::register)

@@ -17,8 +17,10 @@ public class WebSocketCommunicator extends Endpoint {
 
     public WebSocketCommunicator(String serverUrl, ServerMessageObserver observer) throws Exception {
         URI uri = new URI(serverUrl.replace("http", "ws") + "/ws");
+        System.out.println("[DEBUG] Attempting WebSocket connection to: " + uri);
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         session = container.connectToServer(this, uri);
+        System.out.println("[DEBUG] connectToServer returned, session open: " + session.isOpen());
         this.session.addMessageHandler((MessageHandler.Whole<String>) message -> {
             ServerMessage baseMessage = gson.fromJson(message, ServerMessage.class);
             ServerMessage typed = null;
@@ -29,11 +31,17 @@ public class WebSocketCommunicator extends Endpoint {
             } else if (baseMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
                 typed = gson.fromJson(message, NotificationMessage.class);
             }
-            observer.onMessage(typed);
+            if (typed != null) {
+                observer.onMessage(typed);
+            } else {
+                System.out.println("[DEBUG] typed was null for message: " + message);
+            }
         });
     }
 
     public void send(UserGameCommand command) throws IOException {
+        String json = gson.toJson(command);
+        System.out.println("[DEBUG] WebSocket sending: " + json);
         session.getBasicRemote().sendText(gson.toJson(command));
     }
 
@@ -45,5 +53,6 @@ public class WebSocketCommunicator extends Endpoint {
 
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
+        System.out.println("[DEBUG] WebSocket onOpen fired, session: " + session.getId());
     }
 }

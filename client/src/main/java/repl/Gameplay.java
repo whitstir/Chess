@@ -39,7 +39,7 @@ public class Gameplay implements ServerMessageObserver {
     }
 
     public void run() {
-        boolean enteredGame = true;
+        enteredGame = true;
         while (enteredGame) {
             String[] input = getInput();
             switch (input[0].toLowerCase()) {
@@ -91,7 +91,7 @@ public class Gameplay implements ServerMessageObserver {
             webSocketCommunicator.send(new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID));
             webSocketCommunicator.close();
         } catch (Exception e) {
-            out.println("Couldn't leave the game.");
+            out.println("Couldn't leave the game." + e.getMessage());
         }
     }
 
@@ -138,7 +138,7 @@ public class Gameplay implements ServerMessageObserver {
             ChessMove move = new ChessMove(fromPosition, toPosition, promotion);
             webSocketCommunicator.send(new MakeMoveCommand(authToken, gameID, move));
         } catch (Exception e) {
-            out.println("Invalid move");
+            out.println("Invalid move: " + e.getMessage());
         }
     }
 
@@ -220,25 +220,38 @@ public class Gameplay implements ServerMessageObserver {
     }
 
     private String[] getInput() {
-        if (enteredGame) {
-            out.print("\n[LOGGED IN] >>> ");
+        String side;
+        if (playerColor != null) {
+            side = playerColor.toString();
         } else {
-            out.print("\n[LOGGED OUT] >>> ");
+            side = "OBSERVER";
         }
+        out.print("\n[" + side + "] >>> ");
         return scanner.nextLine().split(" ");
     }
 
     @Override
     public void onMessage(ServerMessage message) {
+        System.out.println("[DEBUG] onMessage called, type: " + message.getServerMessageType());
         out.println();
+        String side;
         if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-            currentGame = ((LoadGameMessage) message).getGame().game();
+            LoadGameMessage lgm = (LoadGameMessage) message;
+            System.out.println("[DEBUG CLIENT] game object: " + lgm.getGame());
+            System.out.println("[DEBUG CLIENT] chess game: " + lgm.getGame().game());
+            currentGame = lgm.getGame().game();
             redrawBoard();
         } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
             out.println("[ERROR] " + ((ErrorMessage) message).getErrorMessage());
         } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
             out.println(((NotificationMessage) message).getNotificationMessage());
         }
+        if (playerColor != null) {
+            side = playerColor.toString();
+        } else {
+            side = "OBSERVER";
+        }
+        out.print("\n[" + side + "] >>> ");
     }
 
 }
