@@ -16,9 +16,12 @@ public class WebSocketCommunicator extends Endpoint {
     private final Gson gson = new Gson();
 
     public WebSocketCommunicator(String serverUrl, ServerMessageObserver observer) throws Exception {
-        URI uri = new URI(serverUrl.replace("http", "ws") + "/ws");
+        serverUrl = serverUrl.replace("http", "ws");
+        URI socketURI = new URI(serverUrl + "/ws");
+
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-        session = container.connectToServer(this, uri);
+        session = container.connectToServer(this, socketURI);
+
         this.session.addMessageHandler((MessageHandler.Whole<String>) message -> {
             try {
                 ServerMessage baseMessage = gson.fromJson(message, ServerMessage.class);

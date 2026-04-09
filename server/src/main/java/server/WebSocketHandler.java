@@ -6,6 +6,8 @@ import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import io.javalin.websocket.*;
 import model.GameData;
+import org.eclipse.jetty.websocket.api.Session;
+import org.jetbrains.annotations.NotNull;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
