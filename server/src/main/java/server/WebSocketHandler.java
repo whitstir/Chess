@@ -127,14 +127,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             opponentName = game.whiteUsername();
         }
         if (game.game().isInCheckmate(opponent)) {
+            game.game().setGameOver(true);
+            dao.updateGame(game);
             connections.broadcastAll(gameID, gson.toJson(new NotificationMessage(
                     opponentName + " is in checkmate! Game over.")));
+        } else if (game.game().isInStalemate(opponent)) {
+            game.game().setGameOver(true);
+            dao.updateGame(game);
+            connections.broadcastAll(gameID, gson.toJson(new NotificationMessage(
+                    "Stalemate! The game is a draw.")));
         } else if (game.game().isInCheck(opponent)) {
             connections.broadcastAll(gameID, gson.toJson(new NotificationMessage(
                     opponentName + " is in check!")));
-        } else if (game.game().isInStalemate(opponent))
-            connections.broadcastAll(gameID, gson.toJson(new NotificationMessage(
-                    "Stalemate! The game is a draw.")));
+        }
     }
 
     private void handleLeave(WsContext ctx, UserGameCommand userGameCommand, String username)

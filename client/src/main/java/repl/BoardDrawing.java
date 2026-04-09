@@ -7,6 +7,8 @@ import chess.ChessPosition;
 import ui.EscapeSequences;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class BoardDrawing {
     public static void drawBoard(ChessGame game, ChessGame.TeamColor side) {
@@ -122,5 +124,61 @@ public class BoardDrawing {
 
     public static void drawHighlights(ChessGame game, ChessGame.TeamColor drawFrom, ChessPosition position,
                                       Collection<ChessMove> possibleMoves) {
+        Set<ChessPosition> validDestinations = new HashSet<>();
+        for (ChessMove move : possibleMoves) {
+            validDestinations.add(move.getEndPosition());
+        }
+        if (drawFrom == ChessGame.TeamColor.WHITE) {
+            drawWhiteBoardHighlighted(game, position, validDestinations);
+        } else {
+            drawBlackBoardHighlighted(game, position, validDestinations);
+        }
+    }
+
+    private static void drawWhiteBoardHighlighted(ChessGame game, ChessPosition selected, Set<ChessPosition> validMoves) {
+        printColumnsWhite();
+        for (int row = 8; row > 0; row--) {
+            printBorderSquare(" " + row + " ");
+            for (int col = 1; col <= 8; col++) {
+                makeSquareHighlighted(game, row, col, selected, validMoves);
+            }
+            printBorderSquare(" " + row + " ");
+            System.out.println();
+        }
+        printColumnsWhite();
+    }
+
+    private static void drawBlackBoardHighlighted(ChessGame game, ChessPosition selected, Set<ChessPosition> validMoves) {
+        printColumnsBlack();
+        for (int row = 1; row <= 8; row++) {
+            printBorderSquare(" " + row + " ");
+            for (int col = 8; col > 0; col--) {
+                makeSquareHighlighted(game, row, col, selected, validMoves);
+            }
+            printBorderSquare(" " + row + " ");
+            System.out.println();
+        }
+        printColumnsBlack();
+    }
+
+    private static void makeSquareHighlighted(ChessGame game, int row, int col,
+                                              ChessPosition selected, Set<ChessPosition> validMoves) {
+        ChessPosition position = new ChessPosition(row, col);
+        ChessPiece chessPiece = game.getBoard().getPiece(position);
+        if (position.equals(selected)) {
+            System.out.print(EscapeSequences.SET_BG_COLOR_YELLOW);
+        } else if (validMoves.contains(position)) {
+            System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+        } else {
+            colorSquare(row, col);
+        }
+        if (chessPiece == null) {
+            System.out.print(EscapeSequences.EMPTY);
+        } else {
+            System.out.print(getPiece(chessPiece));
+        }
+        System.out.print(EscapeSequences.RESET_BG_COLOR);
+        System.out.print(EscapeSequences.RESET_TEXT_COLOR);
+        
     }
 }

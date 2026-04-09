@@ -23,7 +23,7 @@ public class Gameplay implements ServerMessageObserver {
     private final String authToken;
     private final int gameID;
     private final ChessGame.TeamColor playerColor;
-    private ChessGame currentGame;
+    private volatile ChessGame currentGame;
     boolean enteredGame = false;
 
     public Gameplay(WebSocketCommunicator webSocketCommunicator, String authToken, int gameID,
@@ -126,6 +126,7 @@ public class Gameplay implements ServerMessageObserver {
         }
         if (input.length < 3) {
             printMove();
+            return;
         }
         try {
             ChessPosition fromPosition = getPosition(input[1]);
