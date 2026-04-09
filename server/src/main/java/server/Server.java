@@ -36,7 +36,7 @@ public class Server {
 
     public Server() {
         WebSocketHandler wsHandler = new WebSocketHandler(dao);
-        javalin = Javalin.create()
+        javalin = Javalin.create(config -> config.staticFiles.add("web"))
                 .ws("/ws", ws -> {
                     ws.onConnect(wsHandler::handleConnect);
                     ws.onMessage(ctx -> wsHandler.handleMessage(ctx));

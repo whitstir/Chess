@@ -20,18 +20,22 @@ public class WebSocketCommunicator extends Endpoint {
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         session = container.connectToServer(this, uri);
         this.session.addMessageHandler((MessageHandler.Whole<String>) message -> {
-            ServerMessage baseMessage = gson.fromJson(message, ServerMessage.class);
-            ServerMessage typed = null;
-            if (baseMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-                typed = gson.fromJson(message, LoadGameMessage.class);
-            } else if (baseMessage.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
-                typed = gson.fromJson(message, ErrorMessage.class);
-            } else if (baseMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
-                typed = gson.fromJson(message, NotificationMessage.class);
-            }
-            if (typed != null) {
-                observer.onMessage(typed);
-            } else {
+            try {
+                ServerMessage baseMessage = gson.fromJson(message, ServerMessage.class);
+                ServerMessage typed = null;
+                if (baseMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+                    typed = gson.fromJson(message, LoadGameMessage.class);
+                } else if (baseMessage.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+                    typed = gson.fromJson(message, ErrorMessage.class);
+                } else if (baseMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+                    typed = gson.fromJson(message, NotificationMessage.class);
+                }
+                if (typed != null) {
+                    observer.onMessage(typed);
+                }
+            } catch (Exception e) {
+                System.err.println("Error processing WebSocket message: " + e.getMessage());
+                e.printStackTrace(System.err);
             }
         });
     }
